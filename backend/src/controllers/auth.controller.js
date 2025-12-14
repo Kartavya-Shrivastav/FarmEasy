@@ -8,6 +8,7 @@ import {
 } from "../utils/jwt.js";
 import { sendEmail } from "../utils/mailer.js";
 import { env } from "../config/env.js";
+import { verifyRefreshToken } from "../utils/jwt.js";
 
 export const signup = async (req, res, next) => {
   try {
@@ -154,4 +155,48 @@ export const logout = (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   return res.json({ success: true, message: "Logged out" });
+};
+
+export const refresh = async (req, res, next) => {
+  try {
+    const token = req.cookies?.refreshToken;
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "No refresh token" });
+    }
+
+    const decoded = verifyRefreshToken(token);
+
+    const user = await User.findById(decoded.sub);
+    if (!user) {
+      return res.status(401).json({ success: false, message: "User not found" });
+    }
+
+    const accessToken = generateAccessToken(user);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: env.nodeEnv === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000
+    });
+
+    return res.json({ success: true, accessToken });
+  } catch (err) {
+    return res.status(401).json({ success: false, message: "Invalid refresh token" });
+  }
+};
+
+export const me = async (req, res) => {
+  // requireAuth middleware will attach req.user
+  return res.json({
+    success: true,
+    user: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+      isEmailVerified: req.user.isEmailVerified
+    }
+  });
 };
