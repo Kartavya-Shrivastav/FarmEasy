@@ -9,6 +9,9 @@ import authRouter from "./routes/auth.routes.js";
 import auctionRouter from "./routes/auction.routes.js";
 import bidRouter from "./routes/bid.routes.js";
 import adminRouter from "./routes/admin.routes.js";
+import profileRouter from "./routes/profile.routes.js";
+import reviewRouter from "./routes/review.routes.js";
+
 
 
 const app = express();
@@ -32,6 +35,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/auctions", auctionRouter);
 app.use("/api", bidRouter);
 app.use("/api/admin", adminRouter);
+
+app.use("/api/profile", profileRouter);
+app.use("/api", reviewRouter);
 
 
 app.get("/api/health", (req, res) => {

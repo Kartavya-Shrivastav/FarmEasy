@@ -43,8 +43,13 @@ const userSchema = new Schema(
     emailVerificationToken: String,
     emailVerificationExpires: Date,
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    
+    averageRating: { type: Number, default: 0, min: 0, max: 5 },
+    totalReviews: { type: Number, default: 0, min: 0 }
+
   },
+  
   { timestamps: true }
 );
 
