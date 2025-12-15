@@ -44,7 +44,9 @@ const auctionSchema = new Schema(
       isLocked: { type: Boolean, default: false },
       lockedAt: Date,
       buyer: { type: Schema.Types.ObjectId, ref: "User" },
-      amount: Number
+      amount: Number,
+      isPaid: { type: Boolean, default: false },
+      paidAt: Date
     }
   },
   { timestamps: true }

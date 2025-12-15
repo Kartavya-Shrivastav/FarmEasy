@@ -14,7 +14,7 @@ import adminRouter from "./routes/admin.routes.js";
 import profileRouter from "./routes/profile.routes.js";
 import reviewRouter from "./routes/review.routes.js";
 import uploadRouter from "./routes/upload.routes.js";
-
+import paymentRouter from "./routes/payment.routes.js";
 
 
 const app = express();
@@ -43,6 +43,7 @@ app.use("/api/profile", profileRouter);
 app.use("/api", reviewRouter);
 
 app.use("/api/upload", uploadRouter);
+app.use("/api", paymentRouter);
 
 
 app.get("/api/health", (req, res) => {
