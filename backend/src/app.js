@@ -19,6 +19,10 @@ import paymentRouter from "./routes/payment.routes.js";
 
 const app = express();
 
+// Enable trust proxy for Socket.io
+app.set("trust proxy", 1);
+
+
 app.use(helmet());
 app.use(
   cors({
