@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Home",
+    "marketplace": "Marketplace",
+    "myProfile": "My Profile",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "admin": "Admin"
+  },
+  "common": {
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close"
+  },
+  "auth": {
+    "loginTitle": "Login to FarmEasy",
+    "signupTitle": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "phone": "Phone",
+    "role": "I am a",
+    "farmer": "Farmer",
+    "buyer": "Buyer",
+    "loginButton": "Login",
+    "signupButton": "Sign Up",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?"
+  },
+  "marketplace": {
+    "title": "Marketplace",
+    "searchPlaceholder": "Search auctions...",
+    "category": "Category",
+    "location": "Location",
+    "priceRange": "Price Range",
+    "noAuctions": "No auctions found"
+  },
+  "auction": {
+    "placeBid": "Place Bid",
+    "currentBid": "Current Bid",
+    "minBid": "Minimum Bid",
+    "endsAt": "Ends At",
+    "quantity": "Quantity",
+    "location": "Location",
+    "description": "Description",
+    "bidHistory": "Bid History"
+  }
+}

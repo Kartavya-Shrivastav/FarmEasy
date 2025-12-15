@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "होम",
+    "marketplace": "बाज़ार",
+    "myProfile": "मेरी प्रोफ़ाइल",
+    "login": "लॉगिन",
+    "signup": "साइन अप",
+    "logout": "लॉगआउट",
+    "admin": "एडमिन"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "submit": "जमा करें",
+    "cancel": "रद्द करें",
+    "save": "सेव करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "close": "बंद करें"
+  },
+  "auth": {
+    "loginTitle": "FarmEasy में लॉगिन करें",
+    "signupTitle": "खाता बनाएं",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "name": "नाम",
+    "phone": "फ़ोन",
+    "role": "मैं हूँ",
+    "farmer": "किसान",
+    "buyer": "खरीदार",
+    "loginButton": "लॉगिन करें",
+    "signupButton": "साइन अप करें",
+    "noAccount": "खाता नहीं है?",
+    "haveAccount": "पहले से खाता है?"
+  },
+  "marketplace": {
+    "title": "बाज़ार",
+    "searchPlaceholder": "नीलामी खोजें...",
+    "category": "श्रेणी",
+    "location": "स्थान",
+    "priceRange": "मूल्य सीमा",
+    "noAuctions": "कोई नीलामी नहीं मिली"
+  },
+  "auction": {
+    "placeBid": "बोली लगाएं",
+    "currentBid": "वर्तमान बोली",
+    "minBid": "न्यूनतम बोली",
+    "endsAt": "समाप्त होती है",
+    "quantity": "मात्रा",
+    "location": "स्थान",
+    "description": "विवरण",
+    "bidHistory": "बोली इतिहास"
+  }
+}
