@@ -45,10 +45,15 @@ export const createPaymentOrder = async (req, res, next) => {
     // Create Razorpay order
     const amount = Math.round(auction.lockedDeal.amount * 100); // convert to paise
 
+    // Generate short receipt (max 40 chars for Razorpay)
+    const timestamp = Date.now().toString().slice(-8); // last 8 digits
+    const auctionIdShort = auction._id.toString().slice(-8); // last 8 chars of auction ID
+    const receipt = `rcpt_${auctionIdShort}_${timestamp}`; // total ~22 chars
+
     const options = {
       amount,
       currency: "INR",
-      receipt: `auction_${auction._id}_${Date.now()}`
+      receipt
     };
 
     const order = await razorpayInstance.orders.create(options);
@@ -74,6 +79,7 @@ export const createPaymentOrder = async (req, res, next) => {
     next(err);
   }
 };
+
 
 export const verifyPayment = async (req, res, next) => {
   try {
