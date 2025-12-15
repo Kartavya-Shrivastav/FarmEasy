@@ -131,6 +131,17 @@ export const lockDeal = async (req, res, next) => {
 
     await auction.save();
 
+    // Emit auction closed event
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`auction:${auction._id}`).emit("auction-closed", {
+        auctionId: auction._id,
+        winner: auction.lockedDeal.buyer,
+        finalAmount: auction.lockedDeal.amount,
+        lockedAt: auction.lockedDeal.lockedAt
+      });
+    }
+
     return res.json({ success: true, auction });
   } catch (err) {
     next(err);

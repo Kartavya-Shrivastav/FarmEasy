@@ -72,6 +72,21 @@ export const placeBid = async (req, res, next) => {
       amount: bidAmount
     });
 
+    // Emit real-time update to all clients watching this auction
+    const io = req.app.get("io");
+    if (io) {
+      io.to(`auction:${auction._id}`).emit("new-bid", {
+        auctionId: updated._id,
+        currentHighestBidAmount: updated.currentHighestBidAmount,
+        currentHighestBidder: updated.currentHighestBidder,
+        newBid: {
+          amount: bidAmount,
+          bidder: req.user.name,
+          timestamp: new Date()
+        }
+      });
+    }
+
     return res.status(StatusCodes.CREATED).json({ success: true, bid, auction: updated });
   } catch (err) {
     next(err);

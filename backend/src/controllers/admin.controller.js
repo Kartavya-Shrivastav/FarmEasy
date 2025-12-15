@@ -33,6 +33,17 @@ export const approveAuction = async (req, res, next) => {
 
     await auction.save();
 
+    // Emit auction approved event
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("auction-approved", {
+        auctionId: auction._id,
+        title: auction.title,
+        category: auction.category,
+        auctionEndsAt: auction.auctionEndsAt
+      });
+    }
+
     return res.json({ success: true, auction });
   } catch (err) {
     next(err);
