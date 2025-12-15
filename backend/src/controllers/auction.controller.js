@@ -13,9 +13,29 @@ export const createAuctionRequest = async (req, res, next) => {
       return res.status(StatusCodes.FORBIDDEN).json({ success: false, message: "Only farmers can create listings" });
     }
 
+    // Parse images if they come as JSON string (from form-data)
+    let images = [];
+    if (req.body.images) {
+      try {
+        images = typeof req.body.images === "string" ? JSON.parse(req.body.images) : req.body.images;
+      } catch (e) {
+        images = req.body.images;
+      }
+    }
+
     const payload = {
       farmer: req.user._id,
-      ...req.body,
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      quantity: req.body.quantity,
+      unit: req.body.unit,
+      location: req.body.location,
+      dateOfEntry: req.body.dateOfEntry,
+      expiresAt: req.body.expiresAt,
+      minPrice: req.body.minPrice,
+      minBidHop: req.body.minBidHop,
+      images,
       status: "PENDING"
     };
 
@@ -26,6 +46,7 @@ export const createAuctionRequest = async (req, res, next) => {
     next(err);
   }
 };
+
 
 export const listMarketAuctions = async (req, res, next) => {
   try {

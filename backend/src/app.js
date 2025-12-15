@@ -3,14 +3,17 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+
 import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/error.middleware.js";
+
 import authRouter from "./routes/auth.routes.js";
 import auctionRouter from "./routes/auction.routes.js";
 import bidRouter from "./routes/bid.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import profileRouter from "./routes/profile.routes.js";
 import reviewRouter from "./routes/review.routes.js";
+import uploadRouter from "./routes/upload.routes.js";
 
 
 
@@ -38,6 +41,8 @@ app.use("/api/admin", adminRouter);
 
 app.use("/api/profile", profileRouter);
 app.use("/api", reviewRouter);
+
+app.use("/api/upload", uploadRouter);
 
 
 app.get("/api/health", (req, res) => {
