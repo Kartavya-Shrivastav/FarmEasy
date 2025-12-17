@@ -9,6 +9,8 @@ import VerifyEmailPage from './features/auth/VerifyEmailPage';
 import MarketplacePage from './features/auctions/MarketplacePage';
 import AuctionDetailPage from './features/auctions/AuctionDetailPage';
 import api from './services/api';
+import ProfilePage from './features/profile/ProfilePage';
+import AdminDashboard from './features/admin/AdminDashboard';
 
 import CreateAuctionPage from './features/auctions/CreateAuctionPage';
 import MyAuctionsPage from './features/auctions/MyAuctionsPage';
@@ -62,6 +64,8 @@ function App() {
           <Route path="auctions/:id" element={<AuctionDetailPage />} />
           <Route path="create-auction" element={<CreateAuctionPage />} />
           <Route path="my-auctions" element={<MyAuctionsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </Router>
