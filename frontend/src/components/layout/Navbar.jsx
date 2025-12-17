@@ -70,17 +70,18 @@ const Navbar = () => {
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="btn-secondary text-sm"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-3 rounded-lg transition-colors text-sm"
                 >
+
                   {t('nav.logout')}
                 </button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link to="/login" className="btn-secondary text-sm">
+                <Link to="/login" className="bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-3 rounded-lg transition-colors text-sm">
                   {t('nav.login')}
                 </Link>
-                <Link to="/signup" className="btn-primary text-sm">
+                <Link to="/signup" className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm">
                   {t('nav.signup')}
                 </Link>
               </div>
