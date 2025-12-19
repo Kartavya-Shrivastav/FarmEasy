@@ -33,7 +33,8 @@ const BidModal = ({ isOpen, onClose, auction, onBidSuccess }) => {
       setAmount('');
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to place bid');
+      const errorMsg = err.response?.data?.message || 'Failed to place bid';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

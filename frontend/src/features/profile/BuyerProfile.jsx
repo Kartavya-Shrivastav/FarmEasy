@@ -4,11 +4,15 @@ import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { openRazorpayCheckout } from '../../services/razorpay';
+import { showSuccess, showError, showInfo } from '../../utils/toast';
+import ReviewModal from '../../components/auction/ReviewModal';
 
 const BuyerProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('active'); // active, outbid, purchases
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedAuctionForReview, setSelectedAuctionForReview] = useState(null); 
 
   useEffect(() => {
     fetchProfile();
@@ -34,8 +38,8 @@ const BuyerProfile = () => {
     try {
       const { data: statusData } = await api.get(`/auctions/${auction._id}`);
       if (statusData.auction?.lockedDeal?.isPaid) {
-        alert('This auction has already been paid for!');
-        await fetchProfile(); // Refresh to update UI
+        showInfo('This auction has already been paid for!');
+        await fetchProfile();
         return;
       }
     } catch (error) {
@@ -47,7 +51,7 @@ const BuyerProfile = () => {
     const { data } = await api.post(`/auctions/${auction._id}/payment/create-order`);
     
     if (!data.success) {
-      alert('Failed to create payment order');
+      showError('Failed to create payment order');
       return;
     }
 
@@ -69,11 +73,11 @@ const BuyerProfile = () => {
           });
 
           if (verifyData.data.success) {
-            alert('Payment successful!');
-            await fetchProfile(); // Refresh profile to update status
+            showSuccess('Payment successful! 🎉');
+            await fetchProfile();
           }
         } catch (error) {
-          alert('Payment verification failed');
+          showError('Payment verification failed');
           console.error(error);
         }
       },
@@ -102,7 +106,7 @@ const BuyerProfile = () => {
       }
     );
   } catch (error) {
-    alert(error.response?.data?.message || 'Failed to process payment');
+    showError(error.response?.data?.message || 'Failed to process payment');
   }
 };
 
@@ -300,74 +304,97 @@ const BuyerProfile = () => {
                   <p className="text-gray-600">No purchases yet</p>
                 </div>
               ) : (
-                purchases.map((auction) => (
-                  <div key={auction._id} className="card">
-                    <div className="flex items-center gap-4">
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                        {auction.images?.[0] ? (
-                          <img
-                            src={auction.images[0].url}
-                            alt={auction.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl">
-                            🌾
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{auction.title}</h3>
-                        <p className="text-sm text-gray-600">
-                          Farmer: {auction.farmer?.name}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div>
-                            <p className="text-xs text-gray-600">Purchase Price</p>
-                            <p className="font-bold text-blue-600">
-                              ₹{auction.lockedDeal?.amount}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-600">Status</p>
-                            {auction.lockedDeal?.isPaid ? (
-                              <p className="text-sm font-semibold text-green-600">✓ Paid</p>
+                    purchases.map((auction) => (
+                      <div key={auction._id} className="card">
+                        <div className="flex items-center gap-4">
+                          <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
+                            {auction.images?.[0] ? (
+                              <img
+                                src={auction.images[0].url}
+                                alt={auction.title}
+                                className="w-full h-full object-cover"
+                              />
                             ) : (
-                              <p className="text-sm font-semibold text-red-600">Pending Payment</p>
+                              <div className="w-full h-full flex items-center justify-center text-3xl">
+                                🌾
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{auction.title}</h3>
+                            <p className="text-sm text-gray-600">
+                              Farmer: {auction.farmer?.name}
+                            </p>
+                            <div className="flex items-center gap-4 mt-2">
+                              <div>
+                                <p className="text-xs text-gray-600">Purchase Price</p>
+                                <p className="font-bold text-blue-600">
+                                  ₹{auction.lockedDeal?.amount}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-600">Status</p>
+                                {auction.lockedDeal?.isPaid ? (
+                                  <p className="text-sm font-semibold text-green-600">✓ Paid</p>
+                                ) : (
+                                  <p className="text-sm font-semibold text-red-600">Pending Payment</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Button Section */}
+                          <div>
+                            {auction.lockedDeal?.isPaid ? (
+                              <div className="flex flex-col gap-2 items-end">
+                                <span className="text-sm font-semibold text-green-600">✓ Completed</span>
+                                <div className="flex gap-2">
+                                  <Link to={`/auctions/${auction._id}`}>
+                                    <Button variant="secondary">View</Button>
+                                  </Link>
+                                  <Button
+                                    variant="primary"
+                                    onClick={() => {
+                                      setSelectedAuctionForReview(auction);
+                                      setReviewModalOpen(true);
+                                    }}
+                                  >
+                                    Rate Farmer
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="primary"
+                                onClick={() => handlePayment(auction)}
+                              >
+                                Pay Now
+                              </Button>
                             )}
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Button Section - THIS IS THE FIXED PART */}
-                      <div>
-                        {auction.lockedDeal?.isPaid ? (
-                          <div className="flex flex-col gap-2 items-end">
-                            <span className="text-sm font-semibold text-green-600">✓ Completed</span>
-                            <Link to={`/auctions/${auction._id}`}>
-                              <Button variant="secondary">View Details</Button>
-                            </Link>
-                          </div>
-                        ) : (
-                          <Button
-                            variant="primary"
-                            onClick={() => handlePayment(auction)}
-                          >
-                            Pay Now
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
+                    ))
+                  )}
+                </div>
               )}
             </div>
-)}
+          </div>
 
+          {/* Review Modal - ADD THIS HERE */}
+          {selectedAuctionForReview && (
+            <ReviewModal
+              isOpen={reviewModalOpen}
+              onClose={() => {
+                setReviewModalOpen(false);
+                setSelectedAuctionForReview(null);
+              }}
+              auction={selectedAuctionForReview}
+              onSuccess={fetchProfile}
+            />
+          )}
         </div>
-      </div>
-    </div>
-  );
+      );
 };
 
 export default BuyerProfile;

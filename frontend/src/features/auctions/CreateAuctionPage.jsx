@@ -6,6 +6,7 @@ import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
+import { showSuccess, showError } from '../../utils/toast';
 
 const CreateAuctionPage = () => {
   const { t } = useTranslation();
@@ -118,11 +119,13 @@ const CreateAuctionPage = () => {
       const { data } = await api.post('/auctions', payload);
 
       if (data.success) {
-        alert('Auction created successfully! Waiting for admin approval.');
+        showSuccess('Auction created successfully! Waiting for admin approval.');
         navigate('/my-auctions');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create auction');
+      const errorMsg = err.response?.data?.message || 'Failed to create auction';
+      setError(errorMsg);
+      showError(errorMsg);
     } finally {
       setLoading(false);
     }

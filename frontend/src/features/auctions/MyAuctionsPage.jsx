@@ -4,6 +4,7 @@ import { useAppSelector } from '../../app/hooks';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
+import { showSuccess, showError, showWarning } from '../../utils/toast';
 
 const MyAuctionsPage = () => {
   const navigate = useNavigate();
@@ -42,18 +43,18 @@ const MyAuctionsPage = () => {
   };
 
   const handleLockDeal = async (auctionId) => {
-    if (!confirm('Are you sure you want to lock this deal with the current highest bidder?')) {
+    if (!window.confirm('Are you sure you want to lock this deal with the current highest bidder?')) {
       return;
     }
 
     try {
       const { data } = await api.post(`/auctions/${auctionId}/lock`);
       if (data.success) {
-        alert('Deal locked successfully!');
+        showSuccess('Deal locked successfully!');
         fetchMyAuctions();
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to lock deal');
+      showError(error.response?.data?.message || 'Failed to lock deal');
     }
   };
 

@@ -6,6 +6,7 @@ import Input from '../../components/common/Input';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
 import api from '../../services/api';
+import { showSuccess, showError } from '../../utils/toast';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ const AdminDashboard = () => {
         approvalDates
       );
       if (data.success) {
-        alert('Auction approved successfully!');
+        showSuccess('Auction approved successfully!');
         setModalOpen(false);
         fetchPendingAuctions();
       }
@@ -78,18 +79,18 @@ const AdminDashboard = () => {
   };
 
   const handleReject = async (auctionId) => {
-    if (!confirm('Are you sure you want to reject this auction?')) {
+    if (!window.confirm('Are you sure you want to reject this auction?')) {
       return;
     }
 
     try {
       const { data } = await api.post(`/admin/auctions/${auctionId}/reject`);
       if (data.success) {
-        alert('Auction rejected');
+        showSuccess('Auction rejected');
         fetchPendingAuctions();
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to reject auction');
+      showError(error.response?.data?.message || 'Failed to reject auction');
     }
   };
 
@@ -118,7 +119,7 @@ const AdminDashboard = () => {
               <div key={auction._id} className="border rounded-lg p-4">
                 <div className="flex items-start gap-4">
                   {/* Image */}
-                  <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                  <div className="w-32 h-32 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
                     {auction.images?.[0] ? (
                       <img
                         src={auction.images[0].url}

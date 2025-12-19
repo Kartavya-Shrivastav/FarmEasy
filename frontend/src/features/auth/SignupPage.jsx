@@ -5,6 +5,7 @@ import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
+import { showSuccess, showError } from '../../utils/toast';
 
 const SignupPage = () => {
   const { t } = useTranslation();
@@ -34,9 +35,11 @@ const SignupPage = () => {
       const { data } = await api.post('/auth/signup', formData);
       
       if (data.success) {
-        alert('Signup successful! Please check your email to verify your account.');
-        navigate('/login');
-      }
+      showSuccess('Signup successful! Please check your email to verify your account.');
+      navigate('/login');
+    }
+
+
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed');
     } finally {

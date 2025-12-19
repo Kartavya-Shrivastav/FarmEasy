@@ -7,6 +7,7 @@ import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
+import { showSuccess, showError } from '../../utils/toast';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -36,13 +37,16 @@ const LoginPage = () => {
       if (data.success) {
         localStorage.setItem('accessToken', data.accessToken);
         dispatch(setUser(data.user));
+        showSuccess(`Welcome back, ${data.user.name}!`);
         navigate('/marketplace');
       }
+
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      const errorMsg = err.response?.data?.message || 'Signup failed';
+      setError(errorMsg);
+      showError(errorMsg);
     }
+
   };
 
   return (

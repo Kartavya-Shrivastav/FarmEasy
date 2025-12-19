@@ -8,6 +8,7 @@ import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { initSocket, connectSocket } from '../../services/socket';
+import { showSuccess, showError } from '../../utils/toast';
 
 const AuctionDetailPage = () => {
   const { id } = useParams();
@@ -68,8 +69,7 @@ const AuctionDetailPage = () => {
     try {
       const { data } = await api.post(`/${id}/bids`, { amount });
       if (data.success) {
-        // Socket will update the UI in real-time
-        alert('Bid placed successfully!');
+        showSuccess('Bid placed successfully!');
       }
     } catch (error) {
       throw error;
