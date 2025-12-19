@@ -82,8 +82,8 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
         </div>
       </div>
 
-      <div className="mt-4">
-        <Button variant="secondary" onClick={onClear}>
+      <div className="mt-4 flex flex-col sm:flex-row gap-2">
+        <Button variant="secondary" onClick={onClear} className="w-full sm:w-auto">
           Clear Filters
         </Button>
       </div>

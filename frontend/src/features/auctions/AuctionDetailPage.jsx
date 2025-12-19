@@ -124,7 +124,7 @@ const AuctionDetailPage = () => {
 
           {/* Thumbnail Gallery */}
           {currentAuction.images && currentAuction.images.length > 1 && (
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
               {currentAuction.images.map((image, index) => (
                 <button
                   key={image.publicId || index}
