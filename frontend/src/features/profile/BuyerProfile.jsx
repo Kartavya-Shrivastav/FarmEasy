@@ -204,7 +204,7 @@ const BuyerProfile = () => {
               ) : (
                 activeBids.map((auction) => (
                   <div key={auction._id} className="card">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
                         {auction.images?.[0] ? (
                           <img
