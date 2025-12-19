@@ -57,19 +57,38 @@ const MyAuctionsPage = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (auction) => {
+    // If closed and paid
+    if (auction.status === 'CLOSED' && auction.lockedDeal?.isPaid) {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          COMPLETED
+        </span>
+      );
+    }
+    
+    // If closed but not paid
+    if (auction.status === 'CLOSED' && !auction.lockedDeal?.isPaid) {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+          AWAITING PAYMENT
+        </span>
+      );
+    }
+
     const colors = {
       PENDING: 'bg-yellow-100 text-yellow-800',
-      APPROVED: 'bg-green-100 text-green-800',
-      CLOSED: 'bg-red-100 text-red-800',
+      APPROVED: 'bg-blue-100 text-blue-800',
       REJECTED: 'bg-gray-100 text-gray-800',
     };
+    
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status]}`}>
-        {status}
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[auction.status] || 'bg-gray-100 text-gray-800'}`}>
+        {auction.status}
       </span>
     );
   };
+
 
   if (loading) {
     return (
@@ -101,7 +120,7 @@ const MyAuctionsPage = () => {
             <div key={auction._id} className="card">
               <div className="flex items-start gap-4">
                 {/* Image */}
-                <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                <div className="w-32 h-32 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
                   {auction.images && auction.images.length > 0 ? (
                     <img
                       src={auction.images[0].url}
@@ -124,7 +143,7 @@ const MyAuctionsPage = () => {
                         {auction.quantity} {auction.unit} • {auction.category}
                       </p>
                     </div>
-                    {getStatusBadge(auction.status)}
+                    {getStatusBadge(auction)}
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
@@ -172,17 +191,24 @@ const MyAuctionsPage = () => {
                       )}
 
                     {auction.lockedDeal?.isLocked && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-green-700">
-                          ✓ Deal Locked
-                        </span>
-                        {auction.lockedDeal.isPaid && (
-                          <span className="text-sm font-medium text-blue-700">
-                            • Payment Received
+                      <div className="flex items-center gap-3">
+                        {auction.lockedDeal.isPaid ? (
+                          <>
+                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                              ✓ Paid - ₹{auction.lockedDeal.amount}
+                            </span>
+                            <span className="text-xs text-gray-600">
+                              {new Date(auction.lockedDeal.paidAt).toLocaleDateString()}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
+                            ⏳ Payment Pending
                           </span>
                         )}
                       </div>
                     )}
+
                   </div>
                 </div>
               </div>

@@ -42,10 +42,21 @@ const AuctionCard = ({ auction }) => {
               <span className="text-6xl">🌾</span>
             </div>
           )}
+          
+          {/* Category Badge */}
           <div className="absolute top-2 right-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
             {auction.category}
           </div>
+          
+          {/* Image Count Badge */}
+          {auction.images && auction.images.length > 1 && (
+            <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+              <span>📷</span>
+              <span>{auction.images.length}</span>
+            </div>
+          )}
         </div>
+
 
         {/* Content */}
         <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">

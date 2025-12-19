@@ -19,6 +19,7 @@ const AuctionDetailPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [bidModalOpen, setBidModalOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     fetchAuction();
@@ -98,19 +99,21 @@ const AuctionDetailPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <button
-        onClick={() => navigate('/marketplace')}
+        onClick={() => navigate(-1)}
         className="text-primary-600 hover:text-primary-700 mb-4 flex items-center gap-2"
       >
-        ← Back to Marketplace
+        ← Back
       </button>
 
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Images */}
+        {/* Images Gallery */}
         <div>
-          <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center overflow-hidden">
+          {/* Main Image */}
+          <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center overflow-hidden mb-3">
             {currentAuction.images && currentAuction.images.length > 0 ? (
               <img
-                src={currentAuction.images[0].url}
+                src={currentAuction.images[selectedImageIndex || 0].url}
                 alt={currentAuction.title}
                 className="w-full h-full object-cover"
               />
@@ -118,7 +121,31 @@ const AuctionDetailPage = () => {
               <span className="text-9xl">🌾</span>
             )}
           </div>
+
+          {/* Thumbnail Gallery */}
+          {currentAuction.images && currentAuction.images.length > 1 && (
+            <div className="grid grid-cols-5 gap-2">
+              {currentAuction.images.map((image, index) => (
+                <button
+                  key={image.publicId || index}
+                  onClick={() => setSelectedImageIndex(index)}
+                  className={`relative h-20 bg-gray-200 rounded-lg overflow-hidden border-2 transition-all ${
+                    (selectedImageIndex || 0) === index
+                      ? 'border-primary-600 ring-2 ring-primary-200'
+                      : 'border-transparent hover:border-gray-400'
+                  }`}
+                >
+                  <img
+                    src={image.url}
+                    alt={`${currentAuction.title} ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
 
         {/* Details */}
         <div>

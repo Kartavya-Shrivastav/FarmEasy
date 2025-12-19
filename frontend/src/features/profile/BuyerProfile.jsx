@@ -29,58 +29,83 @@ const BuyerProfile = () => {
   };
 
   const handlePayment = async (auction) => {
+
+    // Double-check payment status before proceeding
     try {
-      // Create order
-      const { data } = await api.post(`/auctions/${auction._id}/payment/create-order`);
-      
-      if (!data.success) {
-        alert('Failed to create payment order');
+      const { data: statusData } = await api.get(`/auctions/${auction._id}`);
+      if (statusData.auction?.lockedDeal?.isPaid) {
+        alert('This auction has already been paid for!');
+        await fetchProfile(); // Refresh to update UI
         return;
       }
-
-      // Open Razorpay checkout
-      const options = {
-        key: data.keyId,
-        amount: data.amount * 100,
-        currency: data.currency,
-        order_id: data.orderId,
-        name: 'FarmEasy',
-        description: `Payment for ${auction.title}`,
-        handler: async (response) => {
-          // Verify payment
-          try {
-            const verifyData = await api.post('/payment/verify', {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            });
-
-            if (verifyData.data.success) {
-              alert('Payment successful!');
-              fetchProfile(); // Refresh to show updated status
-            }
-          } catch (error) {
-            alert('Payment verification failed');
-          }
-        },
-        prefill: {
-          name: profile.name,
-          email: profile.email,
-        },
-        theme: {
-          color: '#16a34a',
-        },
-      };
-
-      openRazorpayCheckout(
-        options,
-        () => {}, // onSuccess handled in handler above
-        () => alert('Payment cancelled')
-      );
     } catch (error) {
-      alert(error.response?.data?.message || 'Failed to process payment');
+      console.error('Error checking payment status:', error);
     }
-  };
+
+  try {
+    // Create order
+    const { data } = await api.post(`/auctions/${auction._id}/payment/create-order`);
+    
+    if (!data.success) {
+      alert('Failed to create payment order');
+      return;
+    }
+
+    // Open Razorpay checkout
+    const options = {
+      key: data.keyId,
+      amount: data.amount * 100,
+      currency: data.currency,
+      order_id: data.orderId,
+      name: 'FarmEasy',
+      description: `Payment for ${auction.title}`,
+      handler: async (response) => {
+        // Verify payment
+        try {
+          const verifyData = await api.post('/payment/verify', {
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          });
+
+          if (verifyData.data.success) {
+            alert('Payment successful!');
+            await fetchProfile(); // Refresh profile to update status
+          }
+        } catch (error) {
+          alert('Payment verification failed');
+          console.error(error);
+        }
+      },
+      prefill: {
+        name: profile.name,
+        email: profile.email,
+      },
+      theme: {
+        color: '#16a34a',
+      },
+      modal: {
+        ondismiss: () => {
+          // Check if payment might have succeeded even if modal was closed
+          setTimeout(() => fetchProfile(), 1000);
+        }
+      }
+    };
+
+    openRazorpayCheckout(
+      options,
+      () => {}, // onSuccess handled in handler above
+      () => {
+        console.log('Payment cancelled');
+        // Still refresh in case payment went through
+        setTimeout(() => fetchProfile(), 1000);
+      }
+    );
+  } catch (error) {
+    alert(error.response?.data?.message || 'Failed to process payment');
+  }
+};
+
 
   if (loading) {
     return (
@@ -176,7 +201,7 @@ const BuyerProfile = () => {
                 activeBids.map((auction) => (
                   <div key={auction._id} className="card">
                     <div className="flex items-center gap-4">
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                      <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
                         {auction.images?.[0] ? (
                           <img
                             src={auction.images[0].url}
@@ -230,7 +255,7 @@ const BuyerProfile = () => {
                 outbidAuctions.map((auction) => (
                   <div key={auction._id} className="card bg-orange-50 border border-orange-200">
                     <div className="flex items-center gap-4">
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                      <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
                         {auction.images?.[0] ? (
                           <img
                             src={auction.images[0].url}
@@ -308,29 +333,37 @@ const BuyerProfile = () => {
                             {auction.lockedDeal?.isPaid ? (
                               <p className="text-sm font-semibold text-green-600">✓ Paid</p>
                             ) : (
-                              <p className="text-sm font-semibold text-red-600">Pending</p>
+                              <p className="text-sm font-semibold text-red-600">Pending Payment</p>
                             )}
                           </div>
                         </div>
                       </div>
-                      {!auction.lockedDeal?.isPaid ? (
-                        <Button
-                          variant="primary"
-                          onClick={() => handlePayment(auction)}
-                        >
-                          Pay Now
-                        </Button>
-                      ) : (
-                        <Link to={`/auctions/${auction._id}`}>
-                          <Button variant="secondary">View</Button>
-                        </Link>
-                      )}
+                      
+                      {/* Button Section - THIS IS THE FIXED PART */}
+                      <div>
+                        {auction.lockedDeal?.isPaid ? (
+                          <div className="flex flex-col gap-2 items-end">
+                            <span className="text-sm font-semibold text-green-600">✓ Completed</span>
+                            <Link to={`/auctions/${auction._id}`}>
+                              <Button variant="secondary">View Details</Button>
+                            </Link>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="primary"
+                            onClick={() => handlePayment(auction)}
+                          >
+                            Pay Now
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))
               )}
             </div>
-          )}
+)}
+
         </div>
       </div>
     </div>
