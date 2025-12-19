@@ -40,3 +40,24 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
+
+
+/* Mobile table scroll */
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Better mobile spacing */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+}
