@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 @import "tailwindcss";
 
+/* Import Roboto Font from Google Fonts */
 
 @tailwind base;
 @tailwind components;
@@ -8,6 +10,7 @@
 body {
   background-color: #f9fafb;
   color: #111827;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* Input Field */
@@ -18,11 +21,12 @@ body {
   border-radius: 0.5rem;
   outline: none;
   transition: all 0.2s;
+  font-family: 'Roboto', sans-serif;
 }
 
 .input-field:focus {
   border-color: transparent;
-  box-shadow: 0 0 0 2px #22c55e;
+  box-shadow: 0 0 0 2px #ea7f61;
 }
 
 /* Card */
@@ -40,7 +44,6 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
-
 
 /* Mobile table scroll */
 @media (max-width: 768px) {
@@ -60,4 +63,21 @@ body {
   .card {
     padding: 1rem;
   }
+}
+
+/* Headings with Roboto */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+}
+
+/* Button text */
+button {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}
+
+/* Link text */
+a {
+  font-family: 'Roboto', sans-serif;
 }
