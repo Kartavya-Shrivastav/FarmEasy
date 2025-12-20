@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import BuyerProfile from './BuyerProfile';
+import FarmerProfile from './FarmerProfile';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -16,8 +17,7 @@ const ProfilePage = () => {
   }
 
   if (user.role === 'farmer') {
-    navigate('/my-auctions');
-    return null;
+    return <FarmerProfile />;
   }
 
   if (user.role === 'admin') {

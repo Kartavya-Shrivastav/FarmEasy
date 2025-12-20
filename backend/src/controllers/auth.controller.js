@@ -66,10 +66,34 @@ export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.query;
 
+    console.log('=== EMAIL VERIFICATION DEBUG ===');
+    console.log('Token from URL:', token);
+    console.log('Token length:', token?.length);
+    console.log('Current time:', Date.now());
+
     const user = await User.findOne({
       emailVerificationToken: token,
       emailVerificationExpires: { $gt: Date.now() }
     });
+
+    console.log('User found:', user ? 'YES' : 'NO');
+    
+    if (user) {
+      console.log('User email:', user.email);
+      console.log('Token in DB:', user.emailVerificationToken);
+      console.log('Token expires:', user.emailVerificationExpires);
+      console.log('Time left (ms):', user.emailVerificationExpires - Date.now());
+    } else {
+      // Check if user exists with this token but expired
+      const expiredUser = await User.findOne({ emailVerificationToken: token });
+      if (expiredUser) {
+        console.log('Token found but EXPIRED');
+        console.log('Expired at:', expiredUser.emailVerificationExpires);
+        console.log('Current time:', Date.now());
+      } else {
+        console.log('No user found with this token at all');
+      }
+    }
 
     if (!user) {
       return res
@@ -82,11 +106,15 @@ export const verifyEmail = async (req, res, next) => {
     user.emailVerificationExpires = undefined;
     await user.save();
 
+    console.log('✅ Email verified successfully');
+
     return res.json({ success: true, message: "Email verified successfully" });
   } catch (err) {
+    console.error('Verification error:', err);
     next(err);
   }
 };
+
 
 export const login = async (req, res, next) => {
   try {
