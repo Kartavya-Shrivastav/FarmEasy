@@ -13,6 +13,7 @@ import ProfilePage from './features/profile/ProfilePage';
 import AdminDashboard from './features/admin/AdminDashboard';
 import CreateAuctionPage from './features/auctions/CreateAuctionPage';
 import MyAuctionsPage from './features/auctions/MyAuctionsPage';
+import PublicProfile from './features/profile/PublicProfile';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -25,6 +26,7 @@ import {
   Truck,
   BadgeCheck
 } from 'lucide-react';
+import FarmerProfile from './features/profile/FarmerProfile';
 
 // REDESIGNED HOMEPAGE COMPONENT
 const HomePage = () => {
@@ -507,6 +509,9 @@ function App() {
           <Route path="my-auctions" element={<MyAuctionsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="admin" element={<AdminDashboard />} />
+          <Route path="/profile/:userId" element={<FarmerProfile />} />
+          <Route path="/farmer-profile" element={<FarmerProfile />} />
+          <Route path="/profile" element={<FarmerProfile />} />
         </Route>
       </Routes>
     </Router>

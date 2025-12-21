@@ -6,15 +6,34 @@ import api from '../../services/api';
 import { openRazorpayCheckout } from '../../services/razorpay';
 import { showSuccess, showError, showInfo } from '../../utils/toast';
 import ReviewModal from '../../components/auction/ReviewModal';
+import { 
+  User, 
+  Mail, 
+  TrendingUp, 
+  AlertTriangle, 
+  ShoppingBag,
+  Eye,
+  Gavel,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Star,
+  Package,
+  MapPin,
+  Calendar,
+  Image as ImageIcon
+} from 'lucide-react';
 
 const BuyerProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('active'); // active, outbid, purchases
+  const [activeTab, setActiveTab] = useState('active');
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [selectedAuctionForReview, setSelectedAuctionForReview] = useState(null); 
+  const [selectedAuctionForReview, setSelectedAuctionForReview] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    setIsVisible(true);
     fetchProfile();
   }, []);
 
@@ -27,14 +46,13 @@ const BuyerProfile = () => {
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      showError('Failed to load profile');
     } finally {
       setLoading(false);
     }
   };
 
   const handlePayment = async (auction) => {
-
-    // Double-check payment status before proceeding
     try {
       const { data: statusData } = await api.get(`/auctions/${auction._id}`);
       if (statusData.auction?.lockedDeal?.isPaid) {
@@ -46,75 +64,72 @@ const BuyerProfile = () => {
       console.error('Error checking payment status:', error);
     }
 
-  try {
-    // Create order
-    const { data } = await api.post(`/auctions/${auction._id}/payment/create-order`);
-    
-    if (!data.success) {
-      showError('Failed to create payment order');
-      return;
-    }
+    try {
+      const { data } = await api.post(`/auctions/${auction._id}/payment/create-order`);
+      
+      if (!data.success) {
+        showError('Failed to create payment order');
+        return;
+      }
 
-    // Open Razorpay checkout
-    const options = {
-      key: data.keyId,
-      amount: data.amount * 100,
-      currency: data.currency,
-      order_id: data.orderId,
-      name: 'FarmEasy',
-      description: `Payment for ${auction.title}`,
-      handler: async (response) => {
-        // Verify payment
-        try {
-          const verifyData = await api.post('/payment/verify', {
-            razorpayOrderId: response.razorpay_order_id,
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpaySignature: response.razorpay_signature,
-          });
+      const options = {
+        key: data.keyId,
+        amount: data.amount * 100,
+        currency: data.currency,
+        order_id: data.orderId,
+        name: 'FarmEasy',
+        description: `Payment for ${auction.title}`,
+        handler: async (response) => {
+          try {
+            const verifyData = await api.post('/payment/verify', {
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
 
-          if (verifyData.data.success) {
-            showSuccess('Payment successful! 🎉');
-            await fetchProfile();
+            if (verifyData.data.success) {
+              showSuccess('Payment successful! 🎉');
+              await fetchProfile();
+            }
+          } catch (error) {
+            showError('Payment verification failed');
+            console.error(error);
           }
-        } catch (error) {
-          showError('Payment verification failed');
-          console.error(error);
+        },
+        prefill: {
+          name: profile.name,
+          email: profile.email,
+        },
+        theme: {
+          color: '#ea7f61',
+        },
+        modal: {
+          ondismiss: () => {
+            setTimeout(() => fetchProfile(), 1000);
+          }
         }
-      },
-      prefill: {
-        name: profile.name,
-        email: profile.email,
-      },
-      theme: {
-        color: '#16a34a',
-      },
-      modal: {
-        ondismiss: () => {
-          // Check if payment might have succeeded even if modal was closed
+      };
+
+      openRazorpayCheckout(
+        options,
+        () => {},
+        () => {
+          console.log('Payment cancelled');
           setTimeout(() => fetchProfile(), 1000);
         }
-      }
-    };
-
-    openRazorpayCheckout(
-      options,
-      () => {}, // onSuccess handled in handler above
-      () => {
-        console.log('Payment cancelled');
-        // Still refresh in case payment went through
-        setTimeout(() => fetchProfile(), 1000);
-      }
-    );
-  } catch (error) {
-    showError(error.response?.data?.message || 'Failed to process payment');
-  }
-};
-
+      );
+    } catch (error) {
+      showError(error.response?.data?.message || 'Failed to process payment');
+    }
+  };
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 flex justify-center">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-[#6B6B6B] font-medium">Loading your profile...</p>
+        </div>
       </div>
     );
   }
@@ -124,253 +139,442 @@ const BuyerProfile = () => {
   const purchases = profile?.purchases || [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">My Profile</h1>
+    <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="card">
-          <div className="text-center mb-4">
-            <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-3xl">👤</span>
-            </div>
-            <h2 className="text-xl font-semibold">{profile?.name}</h2>
-            <p className="text-sm text-gray-600">{profile?.email}</p>
-            <p className="text-xs text-gray-500 mt-1">Buyer Account</p>
+      <div className="min-h-screen bg-[#F5F2ED]">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div 
+            className={`mb-8 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+            style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.1s forwards' } : {}}
+          >
+            <h1 className="text-3xl font-bold text-[#2D2D2D] mb-2">My Profile</h1>
+            <p className="text-[#6B6B6B]">Manage your bids and purchases</p>
           </div>
 
-          <div className="space-y-2 mt-6">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Active Bids:</span>
-              <span className="font-semibold text-green-600">{activeBids.length}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Outbid:</span>
-              <span className="font-semibold text-orange-600">{outbidAuctions.length}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Purchases:</span>
-              <span className="font-semibold text-blue-600">{purchases.length}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="lg:col-span-3">
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b">
-            <button
-              onClick={() => setActiveTab('active')}
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === 'active'
-                  ? 'text-primary-600 border-b-2 border-primary-600'
-                  : 'text-gray-600 hover:text-primary-600'
-              }`}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Sidebar */}
+            <div 
+              className={`${isVisible ? 'opacity-0' : 'opacity-0'}`}
+              style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.2s forwards' } : {}}
             >
-              Active Bids ({activeBids.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('outbid')}
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === 'outbid'
-                  ? 'text-primary-600 border-b-2 border-primary-600'
-                  : 'text-gray-600 hover:text-primary-600'
-              }`}
-            >
-              Outbid ({outbidAuctions.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('purchases')}
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === 'purchases'
-                  ? 'text-primary-600 border-b-2 border-primary-600'
-                  : 'text-gray-600 hover:text-primary-600'
-              }`}
-            >
-              Purchases ({purchases.length})
-            </button>
-          </div>
-
-          {/* Active Bids */}
-          {activeTab === 'active' && (
-            <div className="space-y-4">
-              {activeBids.length === 0 ? (
-                <div className="card text-center py-12">
-                  <p className="text-gray-600 mb-4">No active bids</p>
-                  <Link to="/marketplace">
-                    <Button variant="primary">Browse Marketplace</Button>
-                  </Link>
+              <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+                <div className="text-center mb-6">
+                  <div className="w-24 h-24 bg-gradient-to-br from-[#ea7f61] to-[#d85f3f] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <User className="w-12 h-12 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-[#2D2D2D] mb-1">{profile?.name}</h2>
+                  <div className="flex items-center justify-center gap-2 text-sm text-[#6B6B6B] mb-2">
+                    <Mail className="w-4 h-4" />
+                    <p>{profile?.email}</p>
+                  </div>
+                  <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                    Buyer Account
+                  </span>
                 </div>
-              ) : (
-                activeBids.map((auction) => (
-                  <div key={auction._id} className="card">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
-                        {auction.images?.[0] ? (
-                          <img
-                            src={auction.images[0].url}
-                            alt={auction.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl">
-                            🌾
-                          </div>
-                        )}
+
+                <div className="space-y-3 pt-6 border-t border-[#E5DED3]">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-green-600" />
+                      <span className="text-sm font-medium text-[#2D2D2D]">Active Bids</span>
+                    </div>
+                    <span className="text-lg font-bold text-green-600">{activeBids.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-orange-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-orange-600" />
+                      <span className="text-sm font-medium text-[#2D2D2D]">Outbid</span>
+                    </div>
+                    <span className="text-lg font-bold text-orange-600">{outbidAuctions.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-5 h-5 text-blue-600" />
+                      <span className="text-sm font-medium text-[#2D2D2D]">Purchases</span>
+                    </div>
+                    <span className="text-lg font-bold text-blue-600">{purchases.length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              {/* Tabs */}
+              <div 
+                className={`bg-white rounded-2xl shadow-lg border border-[#E5DED3] p-2 mb-6 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.3s forwards' } : {}}
+              >
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setActiveTab('active')}
+                    className={`flex-1 px-4 py-3 font-bold rounded-xl transition-all ${
+                      activeTab === 'active'
+                        ? 'bg-[#ea7f61] text-white shadow-md'
+                        : 'text-[#6B6B6B] hover:bg-[#F5F2ED]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      <span className="hidden sm:inline">Active Bids</span>
+                      <span className="sm:hidden">Active</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        activeTab === 'active' ? 'bg-white/20' : 'bg-[#E5DED3]'
+                      }`}>
+                        {activeBids.length}
+                      </span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('outbid')}
+                    className={`flex-1 px-4 py-3 font-bold rounded-xl transition-all ${
+                      activeTab === 'outbid'
+                        ? 'bg-[#ea7f61] text-white shadow-md'
+                        : 'text-[#6B6B6B] hover:bg-[#F5F2ED]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>Outbid</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        activeTab === 'outbid' ? 'bg-white/20' : 'bg-[#E5DED3]'
+                      }`}>
+                        {outbidAuctions.length}
+                      </span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('purchases')}
+                    className={`flex-1 px-4 py-3 font-bold rounded-xl transition-all ${
+                      activeTab === 'purchases'
+                        ? 'bg-[#ea7f61] text-white shadow-md'
+                        : 'text-[#6B6B6B] hover:bg-[#F5F2ED]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <ShoppingBag className="w-4 h-4" />
+                      <span className="hidden sm:inline">Purchases</span>
+                      <span className="sm:hidden">Bought</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        activeTab === 'purchases' ? 'bg-white/20' : 'bg-[#E5DED3]'
+                      }`}>
+                        {purchases.length}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Active Bids */}
+              {activeTab === 'active' && (
+                <div className="space-y-4">
+                  {activeBids.length === 0 ? (
+                    <div className="bg-white rounded-2xl shadow-lg p-12 border border-[#E5DED3] text-center">
+                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <TrendingUp className="w-10 h-10 text-green-500" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{auction.title}</h3>
-                        <p className="text-sm text-gray-600">
-                          {auction.quantity} {auction.unit} • {auction.location?.district}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div>
-                            <p className="text-xs text-gray-600">Your Bid</p>
-                            <p className="font-bold text-green-600">
-                              ₹{auction.currentHighestBidAmount}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-600">Ends</p>
-                            <p className="text-sm font-semibold">
-                              {new Date(auction.auctionEndsAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <Link to={`/auctions/${auction._id}`}>
-                        <Button variant="secondary">View</Button>
+                      <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">No Active Bids</h3>
+                      <p className="text-[#6B6B6B] mb-6">Start bidding on auctions in the marketplace</p>
+                      <Link to="/marketplace">
+                        <button className="inline-flex items-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl">
+                          <Gavel className="w-5 h-5" />
+                          Browse Marketplace
+                        </button>
                       </Link>
                     </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {/* Outbid */}
-          {activeTab === 'outbid' && (
-            <div className="space-y-4">
-              {outbidAuctions.length === 0 ? (
-                <div className="card text-center py-12">
-                  <p className="text-gray-600">No outbid auctions</p>
-                </div>
-              ) : (
-                outbidAuctions.map((auction) => (
-                  <div key={auction._id} className="card bg-orange-50 border border-orange-200">
-                    <div className="flex items-center gap-4">
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
-                        {auction.images?.[0] ? (
-                          <img
-                            src={auction.images[0].url}
-                            alt={auction.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl">
-                            🌾
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{auction.title}</h3>
-                        <p className="text-sm text-gray-600">
-                          {auction.quantity} {auction.unit}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <div>
-                            <p className="text-xs text-gray-600">Current Highest</p>
-                            <p className="font-bold text-orange-600">
-                              ₹{auction.currentHighestBidAmount}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <Link to={`/auctions/${auction._id}`}>
-                        <Button variant="primary">Bid Again</Button>
-                      </Link>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {/* Purchases */}
-          {activeTab === 'purchases' && (
-            <div className="space-y-4">
-              {purchases.length === 0 ? (
-                <div className="card text-center py-12">
-                  <p className="text-gray-600">No purchases yet</p>
-                </div>
-              ) : (
-                    purchases.map((auction) => (
-                      <div key={auction._id} className="card">
-                        <div className="flex items-center gap-4">
-                          <div className="w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
-                            {auction.images?.[0] ? (
-                              <img
-                                src={auction.images[0].url}
-                                alt={auction.title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-3xl">
-                                🌾
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg">{auction.title}</h3>
-                            <p className="text-sm text-gray-600">
-                              Farmer: {auction.farmer?.name}
-                            </p>
-                            <div className="flex items-center gap-4 mt-2">
-                              <div>
-                                <p className="text-xs text-gray-600">Purchase Price</p>
-                                <p className="font-bold text-blue-600">
-                                  ₹{auction.lockedDeal?.amount}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-600">Status</p>
-                                {auction.lockedDeal?.isPaid ? (
-                                  <p className="text-sm font-semibold text-green-600">✓ Paid</p>
-                                ) : (
-                                  <p className="text-sm font-semibold text-red-600">Pending Payment</p>
-                                )}
+                  ) : (
+                    activeBids.map((auction, index) => (
+                      <div 
+                        key={auction._id}
+                        className={`bg-white rounded-2xl shadow-lg border-2 border-green-200 overflow-hidden hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                        style={isVisible ? { animation: `slideUp 0.6s ease-out ${0.4 + index * 0.1}s forwards` } : {}}
+                      >
+                        <div className="p-6">
+                          <div className="flex flex-col md:flex-row items-start gap-6">
+                            <div className="relative w-full md:w-32 h-32 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                              {auction.images?.[0] ? (
+                                <img
+                                  src={auction.images[0].url}
+                                  alt={auction.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-5xl">
+                                  🌾
+                                </div>
+                              )}
+                              {auction.images && auction.images.length > 1 && (
+                                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                                  <ImageIcon className="w-3 h-3" />
+                                  {auction.images.length}
+                                </div>
+                              )}
+                              <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 animate-pulse">
+                                <TrendingUp className="w-3 h-3" />
+                                Leading
                               </div>
                             </div>
+
+                            <div className="flex-1 space-y-3">
+                              <h3 className="text-xl font-bold text-[#2D2D2D]">{auction.title}</h3>
+                              <div className="flex items-center gap-4 text-sm text-[#6B6B6B]">
+                                <div className="flex items-center gap-1">
+                                  <Package className="w-4 h-4" />
+                                  {auction.quantity} {auction.unit}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="w-4 h-4" />
+                                  {auction.location?.district}
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                    <Gavel className="w-4 h-4 text-green-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-[#6B6B6B]">Your Bid</p>
+                                    <p className="text-lg font-bold text-green-600">
+                                      ₹{auction.currentHighestBidAmount.toLocaleString('en-IN')}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                                    <Calendar className="w-4 h-4 text-red-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-[#6B6B6B]">Ends</p>
+                                    <p className="text-sm font-bold text-[#2D2D2D]">
+                                      {new Date(auction.auctionEndsAt).toLocaleDateString('en-IN', {
+                                        day: 'numeric',
+                                        month: 'short'
+                                      })}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <Link to={`/auctions/${auction._id}`}>
+                              <button className="inline-flex items-center gap-2 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all">
+                                <Eye className="w-4 h-4" />
+                                View
+                              </button>
+                            </Link>
                           </div>
-                          
-                          {/* Button Section */}
-                          <div>
-                            {auction.lockedDeal?.isPaid ? (
-                              <div className="flex flex-col gap-2 items-end">
-                                <span className="text-sm font-semibold text-green-600">✓ Completed</span>
-                                <div className="flex gap-2">
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Outbid Tab */}
+              {activeTab === 'outbid' && (
+                <div className="space-y-4">
+                  {outbidAuctions.length === 0 ? (
+                    <div className="bg-white rounded-2xl shadow-lg p-12 border border-[#E5DED3] text-center">
+                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="w-10 h-10 text-green-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">Great News!</h3>
+                      <p className="text-[#6B6B6B]">You haven't been outbid on any auctions</p>
+                    </div>
+                  ) : (
+                    outbidAuctions.map((auction, index) => (
+                      <div 
+                        key={auction._id}
+                        className={`bg-white rounded-2xl shadow-lg border-2 border-orange-200 overflow-hidden hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                        style={isVisible ? { animation: `slideUp 0.6s ease-out ${0.4 + index * 0.1}s forwards` } : {}}
+                      >
+                        <div className="bg-gradient-to-r from-orange-100 to-orange-50 px-4 py-2 border-b border-orange-200">
+                          <div className="flex items-center gap-2 text-orange-700 text-sm font-bold">
+                            <AlertTriangle className="w-4 h-4" />
+                            You've been outbid! Place a higher bid to compete.
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <div className="flex flex-col md:flex-row items-start gap-6">
+                            <div className="relative w-full md:w-32 h-32 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                              {auction.images?.[0] ? (
+                                <img
+                                  src={auction.images[0].url}
+                                  alt={auction.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-5xl">
+                                  🌾
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex-1 space-y-3">
+                              <h3 className="text-xl font-bold text-[#2D2D2D]">{auction.title}</h3>
+                              <p className="text-sm text-[#6B6B6B] flex items-center gap-2">
+                                <Package className="w-4 h-4" />
+                                {auction.quantity} {auction.unit}
+                              </p>
+
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
+                                  <TrendingUp className="w-4 h-4 text-orange-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-[#6B6B6B]">Current Highest Bid</p>
+                                  <p className="text-lg font-bold text-orange-600">
+                                    ₹{auction.currentHighestBidAmount.toLocaleString('en-IN')}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            <Link to={`/auctions/${auction._id}`}>
+                              <button className="inline-flex items-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md hover:shadow-lg">
+                                <Gavel className="w-4 h-4" />
+                                Bid Again
+                              </button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Purchases Tab */}
+              {activeTab === 'purchases' && (
+                <div className="space-y-4">
+                  {purchases.length === 0 ? (
+                    <div className="bg-white rounded-2xl shadow-lg p-12 border border-[#E5DED3] text-center">
+                      <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ShoppingBag className="w-10 h-10 text-blue-500" />
+                      </div>
+                      <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">No Purchases Yet</h3>
+                      <p className="text-[#6B6B6B]">Win auctions to see your purchases here</p>
+                    </div>
+                  ) : (
+                    purchases.map((auction, index) => (
+                      <div 
+                        key={auction._id}
+                        className={`bg-white rounded-2xl shadow-lg border border-[#E5DED3] overflow-hidden hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                        style={isVisible ? { animation: `slideUp 0.6s ease-out ${0.4 + index * 0.1}s forwards` } : {}}
+                      >
+                        <div className="p-6">
+                          <div className="flex flex-col md:flex-row items-start gap-6">
+                            <div className="relative w-full md:w-32 h-32 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                              {auction.images?.[0] ? (
+                                <img
+                                  src={auction.images[0].url}
+                                  alt={auction.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-5xl">
+                                  🌾
+                                </div>
+                              )}
+                              {auction.lockedDeal?.isPaid && (
+                                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Paid
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex-1 space-y-3">
+                              <h3 className="text-xl font-bold text-[#2D2D2D]">{auction.title}</h3>
+                              <p className="text-sm text-[#6B6B6B] flex items-center gap-2">
+                                <User className="w-4 h-4" />
+                                Farmer: {auction.farmer?.name}
+                              </p>
+
+                              <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                    <CreditCard className="w-4 h-4 text-blue-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-[#6B6B6B]">Purchase Price</p>
+                                    <p className="text-lg font-bold text-blue-600">
+                                      ₹{auction.lockedDeal?.amount.toLocaleString('en-IN')}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                    auction.lockedDeal?.isPaid ? 'bg-green-100' : 'bg-red-100'
+                                  }`}>
+                                    {auction.lockedDeal?.isPaid ? (
+                                      <CheckCircle className="w-4 h-4 text-green-600" />
+                                    ) : (
+                                      <Clock className="w-4 h-4 text-red-600" />
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-[#6B6B6B]">Status</p>
+                                    <p className={`text-sm font-bold ${
+                                      auction.lockedDeal?.isPaid ? 'text-green-600' : 'text-red-600'
+                                    }`}>
+                                      {auction.lockedDeal?.isPaid ? 'Paid' : 'Payment Pending'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                              {auction.lockedDeal?.isPaid ? (
+                                <>
                                   <Link to={`/auctions/${auction._id}`}>
-                                    <Button variant="secondary">View</Button>
+                                    <button className="w-full inline-flex items-center justify-center gap-2 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all">
+                                      <Eye className="w-4 h-4" />
+                                      View
+                                    </button>
                                   </Link>
-                                  <Button
-                                    variant="primary"
+                                  <button
                                     onClick={() => {
                                       setSelectedAuctionForReview(auction);
                                       setReviewModalOpen(true);
                                     }}
+                                    className="w-full inline-flex items-center justify-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md hover:shadow-lg"
                                   >
+                                    <Star className="w-4 h-4" />
                                     Rate Farmer
-                                  </Button>
-                                </div>
-                              </div>
-                            ) : (
-                              <Button
-                                variant="primary"
-                                onClick={() => handlePayment(auction)}
-                              >
-                                Pay Now
-                              </Button>
-                            )}
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  onClick={() => handlePayment(auction)}
+                                  className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
+                                >
+                                  <CreditCard className="w-5 h-5" />
+                                  Pay Now
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -380,21 +584,23 @@ const BuyerProfile = () => {
               )}
             </div>
           </div>
-
-          {/* Review Modal - ADD THIS HERE */}
-          {selectedAuctionForReview && (
-            <ReviewModal
-              isOpen={reviewModalOpen}
-              onClose={() => {
-                setReviewModalOpen(false);
-                setSelectedAuctionForReview(null);
-              }}
-              auction={selectedAuctionForReview}
-              onSuccess={fetchProfile}
-            />
-          )}
         </div>
-      );
+      </div>
+
+      {/* Review Modal */}
+      {selectedAuctionForReview && (
+        <ReviewModal
+          isOpen={reviewModalOpen}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setSelectedAuctionForReview(null);
+          }}
+          auction={selectedAuctionForReview}
+          onSuccess={fetchProfile}
+        />
+      )}
+    </>
+  );
 };
 
 export default BuyerProfile;

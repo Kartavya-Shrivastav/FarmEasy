@@ -64,10 +64,30 @@ export const listMarketAuctions = async (req, res, next) => {
     if (category) filter.category = category;
     if (state) filter["location.state"] = state;
 
+    //Use $expr to check currentHighestBidAmount OR minPrice
     if (minPrice || maxPrice) {
-      filter.currentHighestBidAmount = {};
-      if (minPrice) filter.currentHighestBidAmount.$gte = Number(minPrice);
-      if (maxPrice) filter.currentHighestBidAmount.$lte = Number(maxPrice);
+      filter.$expr = { $and: [] };
+      
+      // Use currentHighestBidAmount if it exists, otherwise fall back to minPrice
+      const currentPrice = {
+        $cond: {
+          if: { $gt: ['$currentHighestBidAmount', 0] },
+          then: '$currentHighestBidAmount',
+          else: '$minPrice'
+        }
+      };
+      
+      if (minPrice) {
+        filter.$expr.$and.push({
+          $gte: [currentPrice, Number(minPrice)]
+        });
+      }
+      
+      if (maxPrice) {
+        filter.$expr.$and.push({
+          $lte: [currentPrice, Number(maxPrice)]
+        });
+      }
     }
 
     if (q) {

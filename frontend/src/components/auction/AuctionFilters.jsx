@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import Input from '../common/Input';
-import Button from '../common/Button';
+import { Search, X, MapPin, Tag } from 'lucide-react';
 
 const AuctionFilters = ({ filters, setFilters, onClear }) => {
   const { t } = useTranslation();
@@ -26,67 +25,173 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
   ];
 
   return (
-    <div className="card mb-6">
-      <h3 className="text-lg font-semibold mb-4">{t('common.filter')}</h3>
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-bold text-[#2D2D2D] flex items-center gap-2">
+          <Search className="w-5 h-5 text-[#ea7f61]" />
+          {t('common.filter')}
+        </h3>
+        {(filters.search || filters.category || filters.state || filters.minPrice || filters.maxPrice) && (
+          <button
+            onClick={onClear}
+            className="text-sm text-[#6B6B6B] hover:text-[#ea7f61] font-bold flex items-center gap-2 transition-colors"
+          >
+            <X className="w-4 h-4" />
+            Clear All
+          </button>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Search */}
-        <Input
-          placeholder={t('marketplace.searchPlaceholder')}
-          value={filters.search}
-          onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+            {t('marketplace.searchPlaceholder')}
+          </label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B]" />
+            <input
+              type="text"
+              placeholder="Search auctions..."
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              className="w-full h-12 pl-11 pr-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+            />
+          </div>
+        </div>
 
         {/* Category */}
-        <select
-          className="input-field"
-          value={filters.category}
-          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-        >
-          <option value="">{t('marketplace.category')} - All</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+            {t('marketplace.category')}
+          </label>
+          <div className="relative">
+            <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B] pointer-events-none z-10" />
+            <select
+              value={filters.category}
+              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+              className="w-full h-12 pl-11 pr-10 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] bg-white appearance-none cursor-pointer"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 0.75rem center',
+                backgroundSize: '1.25rem'
+              }}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {/* State */}
-        <select
-          className="input-field"
-          value={filters.state}
-          onChange={(e) => setFilters({ ...filters, state: e.target.value })}
-        >
-          <option value="">{t('marketplace.location')} - All</option>
-          {states.map((state) => (
-            <option key={state} value={state}>
-              {state}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+            {t('marketplace.location')}
+          </label>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B] pointer-events-none z-10" />
+            <select
+              value={filters.state}
+              onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+              className="w-full h-12 pl-11 pr-10 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] bg-white appearance-none cursor-pointer"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 0.75rem center',
+                backgroundSize: '1.25rem'
+              }}
+            >
+              <option value="">All Locations</option>
+              {states.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {/* Price Range */}
-        <div className="flex gap-2">
-          <Input
-            type="number"
-            placeholder="Min ₹"
-            value={filters.minPrice}
-            onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
-          />
-          <Input
-            type="number"
-            placeholder="Max ₹"
-            value={filters.maxPrice}
-            onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
-          />
+        <div>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+            Price Range
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder="Min ₹"
+              value={filters.minPrice}
+              onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+              className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+            />
+            <input
+              type="number"
+              placeholder="Max ₹"
+              value={filters.maxPrice}
+              onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+              className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col sm:flex-row gap-2">
-        <Button variant="secondary" onClick={onClear} className="w-full sm:w-auto">
-          Clear Filters
-        </Button>
-      </div>
+      {/* Active Filters Display */}
+      {(filters.search || filters.category || filters.state || filters.minPrice || filters.maxPrice) && (
+        <div className="mt-6 pt-6 border-t border-[#E5DED3]">
+          <p className="text-sm font-bold text-[#2D2D2D] mb-3">Active Filters:</p>
+          <div className="flex flex-wrap gap-2">
+            {filters.search && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
+                Search: "{filters.search}"
+                <button 
+                  onClick={() => setFilters({ ...filters, search: '' })}
+                  className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+            {filters.category && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
+                Category: {filters.category}
+                <button 
+                  onClick={() => setFilters({ ...filters, category: '' })}
+                  className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+            {filters.state && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
+                Location: {filters.state}
+                <button 
+                  onClick={() => setFilters({ ...filters, state: '' })}
+                  className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+            {(filters.minPrice || filters.maxPrice) && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
+                Price: ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '∞'}
+                <button 
+                  onClick={() => setFilters({ ...filters, minPrice: '', maxPrice: '' })}
+                  className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

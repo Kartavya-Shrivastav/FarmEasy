@@ -9,6 +9,19 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { initSocket, connectSocket } from '../../services/socket';
 import { showSuccess, showError } from '../../utils/toast';
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Package, 
+  Calendar, 
+  Clock, 
+  TrendingUp, 
+  User, 
+  CheckCircle, 
+  XCircle,
+  Gavel,
+  Info
+} from 'lucide-react';
 
 const AuctionDetailPage = () => {
   const { id } = useParams();
@@ -21,8 +34,10 @@ const AuctionDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [bidModalOpen, setBidModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    setIsVisible(true);
     fetchAuction();
     
     // Initialize Socket.io
@@ -76,18 +91,49 @@ const AuctionDetailPage = () => {
     }
   };
 
+  const getTimeRemaining = (endDate) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const diff = end - now;
+
+    if (diff <= 0) return { text: 'Ended', urgent: false };
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) return { text: `${days}d ${hours}h ${minutes}m`, urgent: days < 2 };
+    if (hours > 0) return { text: `${hours}h ${minutes}m`, urgent: true };
+    return { text: `${minutes}m`, urgent: true };
+  };
+
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 flex justify-center">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-[#6B6B6B] font-medium">Loading auction details...</p>
+        </div>
       </div>
     );
   }
 
   if (!currentAuction) {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
-        <p className="text-xl text-gray-600">Auction not found</p>
+      <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <XCircle className="w-10 h-10 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">Auction not found</h2>
+          <p className="text-[#6B6B6B] mb-6">The auction you're looking for doesn't exist or has been removed.</p>
+          <button
+            onClick={() => navigate('/marketplace')}
+            className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
+          >
+            Back to Marketplace
+          </button>
+        </div>
       </div>
     );
   }
@@ -95,131 +141,233 @@ const AuctionDetailPage = () => {
   const isBuyer = user?.role === 'buyer';
   const isFarmer = user?.role === 'farmer' && currentAuction.farmer._id === user._id;
   const isClosed = currentAuction.status === 'CLOSED' || currentAuction.lockedDeal?.isLocked;
+  const timeRemaining = getTimeRemaining(currentAuction.auctionEndsAt);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <button
-        onClick={() => navigate(-1)}
-        className="text-primary-600 hover:text-primary-700 mb-4 flex items-center gap-2"
-      >
-        ← Back
-      </button>
+    <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
 
+      <div className="min-h-screen bg-[#F5F2ED]">
+        <div className="container mx-auto px-4 py-8">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-[#6B6B6B] hover:text-[#ea7f61] font-bold mb-6 transition-colors group"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            Back to Marketplace
+          </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Images Gallery */}
-        <div>
-          {/* Main Image */}
-          <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center overflow-hidden mb-3">
-            {currentAuction.images && currentAuction.images.length > 0 ? (
-              <img
-                src={currentAuction.images[selectedImageIndex || 0].url}
-                alt={currentAuction.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-9xl">🌾</span>
-            )}
-          </div>
-
-          {/* Thumbnail Gallery */}
-          {currentAuction.images && currentAuction.images.length > 1 && (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-              {currentAuction.images.map((image, index) => (
-                <button
-                  key={image.publicId || index}
-                  onClick={() => setSelectedImageIndex(index)}
-                  className={`relative h-20 bg-gray-200 rounded-lg overflow-hidden border-2 transition-all ${
-                    (selectedImageIndex || 0) === index
-                      ? 'border-primary-600 ring-2 ring-primary-200'
-                      : 'border-transparent hover:border-gray-400'
-                  }`}
-                >
+          <div 
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-8 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+            style={isVisible ? {
+              animation: 'slideUp 0.6s ease-out 0.1s forwards'
+            } : {}}
+          >
+            {/* Left Column - Images Gallery */}
+            <div className="space-y-4">
+              {/* Main Image */}
+              <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-[#E5DED3] h-[500px] group">
+                {currentAuction.images && currentAuction.images.length > 0 ? (
                   <img
-                    src={image.url}
-                    alt={`${currentAuction.title} ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    src={currentAuction.images[selectedImageIndex || 0].url}
+                    alt={currentAuction.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3]">
+                    <span className="text-9xl">🌾</span>
+                  </div>
+                )}
 
-
-        {/* Details */}
-        <div>
-          <div className="card">
-            <div className="flex items-start justify-between mb-4">
-              <h1 className="text-3xl font-bold">{currentAuction.title}</h1>
-              <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-medium">
-                {currentAuction.category}
-              </span>
-            </div>
-
-            <p className="text-gray-600 mb-6">{currentAuction.description}</p>
-
-            <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b">
-              <div>
-                <p className="text-sm text-gray-600">{t('auction.quantity')}</p>
-                <p className="text-lg font-semibold">
-                  {currentAuction.quantity} {currentAuction.unit}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">{t('auction.location')}</p>
-                <p className="text-lg font-semibold">
-                  {currentAuction.location?.district}, {currentAuction.location?.state}
-                </p>
-              </div>
-            </div>
-
-            {/* Bidding Info */}
-            <div className="bg-primary-50 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-gray-700">{t('auction.currentBid')}</span>
-                <span className="text-3xl font-bold text-primary-600">
-                  ₹{currentAuction.currentHighestBidAmount || currentAuction.minPrice}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>Minimum Increment: ₹{currentAuction.minBidHop}</span>
-                <span>
-                  Ends: {new Date(currentAuction.auctionEndsAt).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-
-            {/* Actions - THIS IS THE KEY SECTION */}
-            <div className="mt-6">
-              {isClosed ? (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                  <p className="font-semibold">Auction Closed</p>
-                  {currentAuction.lockedDeal?.isPaid && (
-                    <p className="text-sm">Payment completed</p>
+                {/* Overlay Badges */}
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <span className="bg-[#ea7f61] text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm">
+                    {currentAuction.category}
+                  </span>
+                  {isClosed ? (
+                    <span className="bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm">
+                      Closed
+                    </span>
+                  ) : (
+                    <span className={`${timeRemaining.urgent ? 'bg-red-500 animate-pulse' : 'bg-green-500'} text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-1.5`}>
+                      <Clock className="w-4 h-4" />
+                      {timeRemaining.text}
+                    </span>
                   )}
                 </div>
-              ) : isAuthenticated && isBuyer ? (
-                <Button
-                  variant="primary"
-                  onClick={() => setBidModalOpen(true)}
-                  className="w-full text-lg py-3"
-                >
-                  {t('auction.placeBid')}
-                </Button>
-              ) : isAuthenticated && isFarmer ? (
-                <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
-                  This is your auction
+              </div>
+
+              {/* Thumbnail Gallery */}
+              {currentAuction.images && currentAuction.images.length > 1 && (
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                  {currentAuction.images.map((image, index) => (
+                    <button
+                      key={image.publicId || index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`relative h-20 bg-gray-200 rounded-xl overflow-hidden border-3 transition-all ${
+                        (selectedImageIndex || 0) === index
+                          ? 'border-[#ea7f61] ring-2 ring-[#ea7f61]/30 scale-105'
+                          : 'border-[#E5DED3] hover:border-[#ea7f61]/50'
+                      }`}
+                    >
+                      <img
+                        src={image.url}
+                        alt={`${currentAuction.title} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
                 </div>
-              ) : (
-                <Button
-                  variant="primary"
-                  onClick={() => navigate('/login')}
-                  className="w-full text-lg py-3"
-                >
-                  Login to Bid
-                </Button>
               )}
+            </div>
+
+            {/* Right Column - Details */}
+            <div className="space-y-6">
+              {/* Title Card */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+                <h1 className="text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-4">
+                  {currentAuction.title}
+                </h1>
+                <p className="text-[#6B6B6B] leading-relaxed">
+                  {currentAuction.description}
+                </p>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl shadow-lg p-5 border border-[#E5DED3]">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                      <Package className="w-5 h-5 text-[#ea7f61]" />
+                    </div>
+                    <span className="text-sm text-[#6B6B6B] font-medium">{t('auction.quantity')}</span>
+                  </div>
+                  <p className="text-2xl font-bold text-[#2D2D2D] ml-13">
+                    {currentAuction.quantity} {currentAuction.unit}
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-lg p-5 border border-[#E5DED3]">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-[#ea7f61]" />
+                    </div>
+                    <span className="text-sm text-[#6B6B6B] font-medium">{t('auction.location')}</span>
+                  </div>
+                  <p className="text-lg font-bold text-[#2D2D2D] ml-13 truncate">
+                    {currentAuction.location?.district}, {currentAuction.location?.state}
+                  </p>
+                </div>
+              </div>
+
+              {/* Farmer Info - Clickable */}
+              <button
+                onClick={() => navigate(`/profile/${currentAuction.farmer._id}`)}
+                className="w-full bg-white hover:bg-[#FFF8F3] rounded-2xl shadow-lg hover:shadow-xl p-5 border border-[#E5DED3] hover:border-[#ea7f61] transition-all duration-200 cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[#ea7f61]/10 group-hover:bg-[#ea7f61]/20 flex items-center justify-center transition-colors">
+                    <User className="w-6 h-6 text-[#ea7f61]" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm text-[#6B6B6B]">Seller (Click to view profile)</p>
+                    <p className="text-lg font-bold text-[#2D2D2D] group-hover:text-[#ea7f61] transition-colors">
+                      {currentAuction.farmer?.name || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+
+              {/* Bidding Info Card */}
+              <div className="bg-gradient-to-br from-[#ea7f61] to-[#d85f3f] rounded-2xl shadow-xl p-6 text-white">
+                <div className="flex items-center gap-2 mb-4">
+                  <Gavel className="w-5 h-5" />
+                  <span className="text-sm font-medium opacity-90">{t('auction.currentBid')}</span>
+                </div>
+                <div className="text-5xl font-bold mb-6">
+                  ₹{(currentAuction.currentHighestBidAmount || currentAuction.minPrice).toLocaleString('en-IN')}
+                </div>
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
+                  <div>
+                    <p className="text-xs opacity-75 mb-1">Min Increment</p>
+                    <p className="text-lg font-bold">₹{currentAuction.minBidHop}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs opacity-75 mb-1">Ends On</p>
+                    <p className="text-lg font-bold">
+                      {new Date(currentAuction.auctionEndsAt).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div>
+                {isClosed ? (
+                  <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                      <XCircle className="w-5 h-5 text-red-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-red-700 mb-1">Auction Closed</p>
+                      <p className="text-sm text-red-600">This auction has ended and is no longer accepting bids.</p>
+                      {currentAuction.lockedDeal?.isPaid && (
+                        <p className="text-sm text-red-600 mt-2">✓ Payment completed</p>
+                      )}
+                    </div>
+                  </div>
+                ) : isAuthenticated && isBuyer ? (
+                  <button
+                    onClick={() => setBidModalOpen(true)}
+                    className="w-full bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg"
+                  >
+                    <Gavel className="w-6 h-6" />
+                    {t('auction.placeBid')}
+                  </button>
+                ) : isAuthenticated && isFarmer ? (
+                  <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <Info className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-blue-700 mb-1">Your Auction</p>
+                      <p className="text-sm text-blue-600">You are the seller of this auction. You cannot place bids on your own listing.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="w-full bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
+                    >
+                      Login as Buyer to Bid
+                    </button>
+                    <p className="text-center text-sm text-[#6B6B6B]">
+                      Don't have an account? <a href="/signup" className="text-[#ea7f61] hover:text-[#d85f3f] font-bold">Sign up</a>
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -232,7 +380,7 @@ const AuctionDetailPage = () => {
         auction={currentAuction}
         onBidSuccess={handlePlaceBid}
       />
-    </div>
+    </>
   );
 };
 

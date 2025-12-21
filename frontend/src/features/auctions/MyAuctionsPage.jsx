@@ -4,27 +4,52 @@ import { useAppSelector } from '../../app/hooks';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
-import { showSuccess, showError, showWarning } from '../../utils/toast';
+import { showSuccess, showError } from '../../utils/toast';
+import { 
+  Plus, 
+  Package, 
+  IndianRupee, 
+  Calendar, 
+  Eye,
+  Lock,
+  CheckCircle,
+  Clock,
+  XCircle,
+  AlertCircle,
+  TrendingUp,
+  Image as ImageIcon
+} from 'lucide-react';
 
 const MyAuctionsPage = () => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Redirect if not farmer
   if (user?.role !== 'farmer') {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
-        <p className="text-xl text-red-600">Only farmers can access this page</p>
-        <Button onClick={() => navigate('/marketplace')} className="mt-4">
-          Go to Marketplace
-        </Button>
+      <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-10 h-10 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">Access Denied</h2>
+          <p className="text-[#6B6B6B] mb-6">Only farmers can access this page.</p>
+          <button
+            onClick={() => navigate('/marketplace')}
+            className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
+          >
+            Go to Marketplace
+          </button>
+        </div>
       </div>
     );
   }
 
   useEffect(() => {
+    setIsVisible(true);
     fetchMyAuctions();
   }, []);
 
@@ -37,6 +62,7 @@ const MyAuctionsPage = () => {
       }
     } catch (error) {
       console.error('Error fetching auctions:', error);
+      showError('Failed to load auctions');
     } finally {
       setLoading(false);
     }
@@ -59,165 +85,320 @@ const MyAuctionsPage = () => {
   };
 
   const getStatusBadge = (auction) => {
-    // If closed and paid
     if (auction.status === 'CLOSED' && auction.lockedDeal?.isPaid) {
       return (
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+          <CheckCircle className="w-3.5 h-3.5" />
           COMPLETED
-        </span>
+        </div>
       );
     }
     
-    // If closed but not paid
     if (auction.status === 'CLOSED' && !auction.lockedDeal?.isPaid) {
       return (
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700">
+          <Clock className="w-3.5 h-3.5" />
           AWAITING PAYMENT
-        </span>
+        </div>
       );
     }
 
-    const colors = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      APPROVED: 'bg-blue-100 text-blue-800',
-      REJECTED: 'bg-gray-100 text-gray-800',
+    const statusConfig = {
+      PENDING: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock },
+      APPROVED: { bg: 'bg-blue-100', text: 'text-blue-700', icon: CheckCircle },
+      REJECTED: { bg: 'bg-gray-100', text: 'text-gray-700', icon: XCircle },
     };
     
+    const config = statusConfig[auction.status] || statusConfig.PENDING;
+    const Icon = config.icon;
+    
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[auction.status] || 'bg-gray-100 text-gray-800'}`}>
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold ${config.bg} ${config.text}`}>
+        <Icon className="w-3.5 h-3.5" />
         {auction.status}
-      </span>
+      </div>
     );
   };
 
-
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 flex justify-center">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-[#6B6B6B] font-medium">Loading your auctions...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">My Auctions</h1>
-        <Link to="/create-auction">
-          <Button variant="primary">+ Create New Auction</Button>
-        </Link>
-      </div>
+    <>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
 
-      {auctions.length === 0 ? (
-        <div className="text-center py-12 card">
-          <p className="text-xl text-gray-600 mb-4">You haven't created any auctions yet</p>
-          <Link to="/create-auction">
-            <Button variant="primary">Create Your First Auction</Button>
-          </Link>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {auctions.map((auction) => (
-            <div key={auction._id} className="card">
-              <div className="flex items-start gap-4">
-                {/* Image */}
-                <div className="w-32 h-32 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
-                  {auction.images && auction.images.length > 0 ? (
-                    <img
-                      src={auction.images[0].url}
-                      alt={auction.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">
-                      🌾
-                    </div>
-                  )}
+      <div className="min-h-screen bg-[#F5F2ED]">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div 
+            className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+            style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.1s forwards' } : {}}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-[#ea7f61] flex items-center justify-center">
+                <Package className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-[#2D2D2D]">My Auctions</h1>
+                <p className="text-[#6B6B6B]">Manage your listed products</p>
+              </div>
+            </div>
+            <Link to="/create-auction">
+              <button className="inline-flex items-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                <Plus className="w-5 h-5" />
+                Create New Auction
+              </button>
+            </Link>
+          </div>
+
+          {/* Stats Card */}
+          {auctions.length > 0 && (
+            <div 
+              className={`bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3] mb-8 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+              style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.2s forwards' } : {}}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <Package className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#6B6B6B]">Total Auctions</p>
+                    <p className="text-2xl font-bold text-[#2D2D2D]">{auctions.length}</p>
+                  </div>
                 </div>
-
-                {/* Details */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="text-xl font-semibold">{auction.title}</h3>
-                      <p className="text-sm text-gray-600">
-                        {auction.quantity} {auction.unit} • {auction.category}
-                      </p>
-                    </div>
-                    {getStatusBadge(auction)}
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
                   </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Min Price</p>
-                      <p className="font-semibold">₹{auction.minPrice}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Current Bid</p>
-                      <p className="font-semibold text-green-600">
-                        ₹{auction.currentHighestBidAmount || 0}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Created</p>
-                      <p className="font-semibold">
-                        {new Date(auction.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    {auction.auctionEndsAt && (
-                      <div>
-                        <p className="text-gray-600">Ends</p>
-                        <p className="font-semibold">
-                          {new Date(auction.auctionEndsAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
+                  <div>
+                    <p className="text-sm text-[#6B6B6B]">Approved</p>
+                    <p className="text-2xl font-bold text-[#2D2D2D]">
+                      {auctions.filter(a => a.status === 'APPROVED').length}
+                    </p>
                   </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-3 mt-4">
-                    <Link to={`/auctions/${auction._id}`}>
-                      <Button variant="secondary">View Details</Button>
-                    </Link>
-
-                    {auction.status === 'APPROVED' &&
-                      auction.currentHighestBidAmount > 0 &&
-                      !auction.lockedDeal?.isLocked && (
-                        <Button
-                          variant="primary"
-                          onClick={() => handleLockDeal(auction._id)}
-                        >
-                          Lock Deal
-                        </Button>
-                      )}
-
-                    {auction.lockedDeal?.isLocked && (
-                      <div className="flex items-center gap-3">
-                        {auction.lockedDeal.isPaid ? (
-                          <>
-                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                              ✓ Paid - ₹{auction.lockedDeal.amount}
-                            </span>
-                            <span className="text-xs text-gray-600">
-                              {new Date(auction.lockedDeal.paidAt).toLocaleDateString()}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium">
-                            ⏳ Payment Pending
-                          </span>
-                        )}
-                      </div>
-                    )}
-
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#6B6B6B]">Pending</p>
+                    <p className="text-2xl font-bold text-[#2D2D2D]">
+                      {auctions.filter(a => a.status === 'PENDING').length}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#6B6B6B]">Completed</p>
+                    <p className="text-2xl font-bold text-[#2D2D2D]">
+                      {auctions.filter(a => a.status === 'CLOSED' && a.lockedDeal?.isPaid).length}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Auctions List */}
+          {auctions.length === 0 ? (
+            <div 
+              className="bg-white rounded-2xl shadow-lg p-12 border border-[#E5DED3] text-center"
+              style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.3s forwards' } : {}}
+            >
+              <div className="w-20 h-20 bg-[#ea7f61]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Package className="w-10 h-10 text-[#ea7f61]" />
+              </div>
+              <h3 className="text-2xl font-bold text-[#2D2D2D] mb-2">No Auctions Yet</h3>
+              <p className="text-[#6B6B6B] mb-6">Start by creating your first auction listing</p>
+              <Link to="/create-auction">
+                <button className="inline-flex items-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                  <Plus className="w-5 h-5" />
+                  Create Your First Auction
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {auctions.map((auction, index) => (
+                <div 
+                  key={auction._id}
+                  className={`bg-white rounded-2xl shadow-lg border border-[#E5DED3] overflow-hidden hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                  style={isVisible ? { animation: `slideUp 0.6s ease-out ${0.3 + index * 0.1}s forwards` } : {}}
+                >
+                  <div className="p-6">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                      {/* Image */}
+                      <div className="relative w-full lg:w-40 h-40 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                        {auction.images && auction.images.length > 0 ? (
+                          <img
+                            src={auction.images[0].url}
+                            alt={auction.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-6xl">
+                            🌾
+                          </div>
+                        )}
+                        {auction.images && auction.images.length > 1 && (
+                          <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1.5 rounded-full flex items-center gap-1.5">
+                            <ImageIcon className="w-3.5 h-3.5" />
+                            {auction.images.length}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Details */}
+                      <div className="flex-1 space-y-4">
+                        {/* Title & Status */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-[#2D2D2D] mb-1">{auction.title}</h3>
+                            <p className="text-sm text-[#6B6B6B] flex items-center gap-2">
+                              <Package className="w-4 h-4" />
+                              {auction.quantity} {auction.unit} • {auction.category}
+                            </p>
+                          </div>
+                          {getStatusBadge(auction)}
+                        </div>
+
+                        {/* Info Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center">
+                              <IndianRupee className="w-4 h-4 text-[#ea7f61]" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#6B6B6B]">Min Price</p>
+                              <p className="text-sm font-bold text-[#2D2D2D]">₹{auction.minPrice}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                              <TrendingUp className="w-4 h-4 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#6B6B6B]">Current Bid</p>
+                              <p className="text-sm font-bold text-green-600">
+                                ₹{auction.currentHighestBidAmount || 0}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                              <Calendar className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-[#6B6B6B]">Created</p>
+                              <p className="text-sm font-bold text-[#2D2D2D]">
+                                {new Date(auction.createdAt).toLocaleDateString('en-IN', {
+                                  day: 'numeric',
+                                  month: 'short'
+                                })}
+                              </p>
+                            </div>
+                          </div>
+
+                          {auction.auctionEndsAt && (
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                                <Clock className="w-4 h-4 text-red-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-[#6B6B6B]">Ends</p>
+                                <p className="text-sm font-bold text-[#2D2D2D]">
+                                  {new Date(auction.auctionEndsAt).toLocaleDateString('en-IN', {
+                                    day: 'numeric',
+                                    month: 'short'
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-wrap items-center gap-3 pt-2">
+                          <Link to={`/auctions/${auction._id}`}>
+                            <button className="inline-flex items-center gap-2 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all">
+                              <Eye className="w-4 h-4" />
+                              View Details
+                            </button>
+                          </Link>
+
+                          {auction.status === 'APPROVED' &&
+                            auction.currentHighestBidAmount > 0 &&
+                            !auction.lockedDeal?.isLocked && (
+                              <button
+                                onClick={() => handleLockDeal(auction._id)}
+                                className="inline-flex items-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md hover:shadow-lg"
+                              >
+                                <Lock className="w-4 h-4" />
+                                Lock Deal
+                              </button>
+                            )}
+
+                          {auction.lockedDeal?.isLocked && (
+                            <div className="flex items-center gap-3">
+                              {auction.lockedDeal.isPaid ? (
+                                <>
+                                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-xl text-sm font-bold">
+                                    <CheckCircle className="w-4 h-4" />
+                                    Paid - ₹{auction.lockedDeal.amount.toLocaleString('en-IN')}
+                                  </div>
+                                  <span className="text-xs text-[#6B6B6B]">
+                                    {new Date(auction.lockedDeal.paidAt).toLocaleDateString('en-IN')}
+                                  </span>
+                                </>
+                              ) : (
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-xl text-sm font-bold">
+                                  <Clock className="w-4 h-4" />
+                                  Payment Pending
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -4,6 +4,16 @@ import Input from '../../components/common/Input';
 import Modal from '../../components/common/Modal';
 import { showSuccess, showError } from '../../utils/toast';
 import api from '../../services/api';
+import { 
+  CheckCircle, 
+  XCircle, 
+  User, 
+  Package, 
+  IndianRupee, 
+  Tag,
+  Image as ImageIcon,
+  AlertCircle
+} from 'lucide-react';
 
 const PendingAuctions = ({ auctions, onUpdate }) => {
   const [selectedAuction, setSelectedAuction] = useState(null);
@@ -58,84 +68,131 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
 
   if (auctions.length === 0) {
     return (
-      <div className="card text-center py-12">
-        <span className="text-6xl mb-4 block">✅</span>
-        <p className="text-xl text-gray-600">No pending auctions</p>
-        <p className="text-sm text-gray-500 mt-2">All auctions have been reviewed</p>
+      <div className="bg-white rounded-2xl shadow-lg p-12 border border-[#E5DED3] text-center">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-10 h-10 text-green-500" />
+        </div>
+        <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">All Caught Up!</h3>
+        <p className="text-[#6B6B6B]">No pending auctions to review</p>
+        <p className="text-sm text-[#6B6B6B] mt-1">All auctions have been reviewed</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {auctions.map((auction) => (
-          <div key={auction._id} className="card border-2 border-yellow-200 bg-yellow-50">
-            <div className="flex flex-col md:flex-row items-start gap-4">
-              {/* Image */}
-              <div className="w-full md:w-32 h-32 bg-gray-200 rounded-lg shrink-0 overflow-hidden">
-                {auction.images?.[0] ? (
-                  <img
-                    src={auction.images[0].url}
-                    alt={auction.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-4xl">
-                    🌾
-                  </div>
-                )}
+          <div 
+            key={auction._id} 
+            className="bg-white rounded-2xl shadow-lg border-2 border-amber-200 overflow-hidden hover:shadow-xl transition-all"
+          >
+            {/* Pending Badge Bar */}
+            <div className="bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm font-bold">PENDING APPROVAL</span>
               </div>
+              <span className="text-xs text-white/90">Awaiting Review</span>
+            </div>
 
-              {/* Details */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold">{auction.title}</h3>
-                  <span className="bg-yellow-600 text-white text-xs px-2 py-1 rounded">
-                    PENDING
-                  </span>
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Image */}
+                <div className="relative w-full md:w-40 h-40 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                  {auction.images?.[0] ? (
+                    <img
+                      src={auction.images[0].url}
+                      alt={auction.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl">
+                      🌾
+                    </div>
+                  )}
+                  {auction.images && auction.images.length > 1 && (
+                    <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1.5 rounded-full flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      {auction.images.length}
+                    </div>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                  {auction.description}
-                </p>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mb-4">
+                {/* Details */}
+                <div className="flex-1 space-y-4">
+                  {/* Title */}
                   <div>
-                    <p className="text-gray-600">Farmer</p>
-                    <p className="font-semibold">{auction.farmer?.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Category</p>
-                    <p className="font-semibold">{auction.category}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600">Quantity</p>
-                    <p className="font-semibold">
-                      {auction.quantity} {auction.unit}
+                    <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">{auction.title}</h3>
+                    <p className="text-sm text-[#6B6B6B] line-clamp-2">
+                      {auction.description}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-gray-600">Min Price</p>
-                    <p className="font-semibold">₹{auction.minPrice}</p>
-                  </div>
-                </div>
 
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    variant="primary"
-                    onClick={() => handleApproveClick(auction)}
-                    className="flex-1"
-                  >
-                    ✓ Approve
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() => handleReject(auction._id)}
-                    className="flex-1"
-                  >
-                    ✗ Reject
-                  </Button>
+                  {/* Info Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-[#ea7f61]" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#6B6B6B]">Farmer</p>
+                        <p className="text-sm font-bold text-[#2D2D2D] truncate">
+                          {auction.farmer?.name}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                        <Tag className="w-4 h-4 text-[#ea7f61]" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#6B6B6B]">Category</p>
+                        <p className="text-sm font-bold text-[#2D2D2D]">{auction.category}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                        <Package className="w-4 h-4 text-[#ea7f61]" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#6B6B6B]">Quantity</p>
+                        <p className="text-sm font-bold text-[#2D2D2D]">
+                          {auction.quantity} {auction.unit}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                        <IndianRupee className="w-4 h-4 text-[#ea7f61]" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#6B6B6B]">Min Price</p>
+                        <p className="text-sm font-bold text-[#2D2D2D]">₹{auction.minPrice}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button
+                      onClick={() => handleApproveClick(auction)}
+                      className="flex-1 inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleReject(auction._id)}
+                      className="flex-1 inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Reject
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -149,44 +206,56 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
         onClose={() => setModalOpen(false)}
         title="Approve Auction"
       >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Set the auction start and end dates for:{' '}
-            <span className="font-semibold">{selectedAuction?.title}</span>
-          </p>
+        <div className="space-y-5">
+          <div className="bg-[#F5F2ED] rounded-xl p-4">
+            <p className="text-sm text-[#6B6B6B] mb-1">Approving auction:</p>
+            <p className="font-bold text-[#2D2D2D]">{selectedAuction?.title}</p>
+          </div>
 
-          <Input
-            label="Auction Starts At"
-            type="datetime-local"
-            value={approvalDates.auctionStartsAt}
-            onChange={(e) =>
-              setApprovalDates({ ...approvalDates, auctionStartsAt: e.target.value })
-            }
-            required
-          />
+          <div>
+            <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+              Auction Starts At
+            </label>
+            <input
+              type="datetime-local"
+              value={approvalDates.auctionStartsAt}
+              onChange={(e) =>
+                setApprovalDates({ ...approvalDates, auctionStartsAt: e.target.value })
+              }
+              required
+              className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D]"
+            />
+          </div>
 
-          <Input
-            label="Auction Ends At"
-            type="datetime-local"
-            value={approvalDates.auctionEndsAt}
-            onChange={(e) =>
-              setApprovalDates({ ...approvalDates, auctionEndsAt: e.target.value })
-            }
-            required
-            min={approvalDates.auctionStartsAt}
-          />
+          <div>
+            <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+              Auction Ends At
+            </label>
+            <input
+              type="datetime-local"
+              value={approvalDates.auctionEndsAt}
+              onChange={(e) =>
+                setApprovalDates({ ...approvalDates, auctionEndsAt: e.target.value })
+              }
+              required
+              min={approvalDates.auctionStartsAt}
+              className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D]"
+            />
+          </div>
 
-          <div className="flex gap-3 mt-6">
-            <Button
-              variant="secondary"
+          <div className="flex gap-3 pt-2">
+            <button
               onClick={() => setModalOpen(false)}
-              className="flex-1"
+              className="flex-1 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2.5 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all"
             >
               Cancel
-            </Button>
-            <Button variant="primary" onClick={handleApprove} className="flex-1">
-              Approve
-            </Button>
+            </button>
+            <button
+              onClick={handleApprove}
+              className="flex-1 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg"
+            >
+              Approve Auction
+            </button>
           </div>
         </div>
       </Modal>

@@ -7,6 +7,18 @@ import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { showSuccess, showError } from '../../utils/toast';
+import { 
+  Package, 
+  MapPin, 
+  Calendar, 
+  IndianRupee, 
+  Image as ImageIcon,
+  Info,
+  Upload,
+  X,
+  AlertCircle,
+  Plus
+} from 'lucide-react';
 
 const CreateAuctionPage = () => {
   const { t } = useTranslation();
@@ -28,7 +40,6 @@ const CreateAuctionPage = () => {
     minBidHop: '',
   });
 
-  const [images, setImages] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,11 +51,20 @@ const CreateAuctionPage = () => {
   // Redirect if not farmer
   if (user?.role !== 'farmer') {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
-        <p className="text-xl text-red-600">Only farmers can create auctions</p>
-        <Button onClick={() => navigate('/marketplace')} className="mt-4">
-          Go to Marketplace
-        </Button>
+      <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-10 h-10 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">Access Denied</h2>
+          <p className="text-[#6B6B6B] mb-6">Only farmers can create auctions. Please login with a farmer account.</p>
+          <button
+            onClick={() => navigate('/marketplace')}
+            className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
+          >
+            Go to Marketplace
+          </button>
+        </div>
       </div>
     );
   }
@@ -57,7 +77,7 @@ const CreateAuctionPage = () => {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + imageFiles.length > 5) {
-      alert('Maximum 5 images allowed');
+      showError('Maximum 5 images allowed');
       return;
     }
     setImageFiles([...imageFiles, ...files]);
@@ -71,13 +91,13 @@ const CreateAuctionPage = () => {
     if (imageFiles.length === 0) return [];
 
     setUploading(true);
-    const formData = new FormData();
+    const formDataObj = new FormData();
     imageFiles.forEach((file) => {
-      formData.append('images', file);
+      formDataObj.append('images', file);
     });
 
     try {
-      const { data } = await api.post('/upload', formData, {
+      const { data } = await api.post('/upload', formDataObj, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return data.images;
@@ -132,235 +152,360 @@ const CreateAuctionPage = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-6">Create New Auction</h1>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="card">
-        {/* Basic Info */}
-        <h2 className="text-xl font-semibold mb-4">Product Information</h2>
-
-        <Input
-          label="Product Title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-          placeholder="e.g., Fresh Organic Tomatoes"
-          maxLength={120}
-        />
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            className="input-field"
-            placeholder="Describe your product..."
-            maxLength={2000}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category
-            </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="input-field"
-              required
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+    <div className="min-h-screen bg-[#F5F2ED] py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        {/* Header */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3] mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-[#ea7f61] flex items-center justify-center">
+              <Plus className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-[#2D2D2D]">Create New Auction</h1>
+              <p className="text-[#6B6B6B]">List your produce for buyers</p>
+            </div>
           </div>
-
-          <Input
-            label="Quantity"
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            required
-            min="1"
-            placeholder="100"
-          />
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-          <select
-            name="unit"
-            value={formData.unit}
-            onChange={handleChange}
-            className="input-field"
-            required
-          >
-            {units.map((unit) => (
-              <option key={unit} value={unit}>
-                {unit}
-              </option>
-            ))}
-          </select>
+        {/* Info Banner */}
+        <div className="bg-blue-50 border-l-4 border-blue-500 rounded-xl p-4 mb-6 flex items-start gap-3">
+          <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-blue-700 font-medium">Your auction will be reviewed by an admin before going live.</p>
+            <p className="text-xs text-blue-600 mt-1">Please ensure all details are accurate.</p>
+          </div>
         </div>
 
-        {/* Location */}
-        <h2 className="text-xl font-semibold mb-4 mt-6">Location</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Input
-            label="State"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            placeholder="Punjab"
-          />
-
-          <Input
-            label="District"
-            name="district"
-            value={formData.district}
-            onChange={handleChange}
-            placeholder="Ludhiana"
-          />
-
-          <Input
-            label="Village (Optional)"
-            name="village"
-            value={formData.village}
-            onChange={handleChange}
-            placeholder="Samrala"
-          />
-        </div>
-
-        {/* Dates */}
-        <h2 className="text-xl font-semibold mb-4 mt-6">Dates</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Date of Entry"
-            type="date"
-            name="dateOfEntry"
-            value={formData.dateOfEntry}
-            onChange={handleChange}
-            required
-          />
-
-          <Input
-            label="Expires At"
-            type="date"
-            name="expiresAt"
-            value={formData.expiresAt}
-            onChange={handleChange}
-            required
-            min={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        {/* Pricing */}
-        <h2 className="text-xl font-semibold mb-4 mt-6">Pricing</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Minimum Price (₹)"
-            type="number"
-            name="minPrice"
-            value={formData.minPrice}
-            onChange={handleChange}
-            required
-            min="0"
-            placeholder="1000"
-          />
-
-          <Input
-            label="Minimum Bid Increment (₹)"
-            type="number"
-            name="minBidHop"
-            value={formData.minBidHop}
-            required
-            onChange={handleChange}
-            min="1"
-            placeholder="50"
-          />
-        </div>
-
-        {/* Images */}
-        <h2 className="text-xl font-semibold mb-4 mt-6">Product Images</h2>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Upload Images (Max 5, up to 5MB each)
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-            className="input-field"
-            disabled={imageFiles.length >= 5}
-          />
-        </div>
-
-        {imageFiles.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-            {imageFiles.map((file, index) => (
-              <div key={index} className="relative">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt={`Preview ${index + 1}`}
-                  className="w-full h-24 object-cover rounded"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-red-700 font-medium">{error}</p>
+            </div>
           </div>
         )}
 
-        {/* Submit */}
-        <div className="flex gap-4 mt-8">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => navigate('/my-auctions')}
-            className="flex-1"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={loading || uploading}
-            className="flex-1"
-          >
-            {loading || uploading ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              'Create Auction'
-            )}
-          </Button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Product Information */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                <Package className="w-5 h-5 text-[#ea7f61]" />
+              </div>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">Product Information</h2>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Product Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  required
+                  placeholder="e.g., Fresh Organic Tomatoes"
+                  maxLength={120}
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+                <p className="text-xs text-[#6B6B6B] mt-1">{formData.title.length}/120 characters</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Description *
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={4}
+                  required
+                  placeholder="Describe your product quality, variety, growing conditions..."
+                  maxLength={2000}
+                  className="w-full px-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B] resize-none"
+                />
+                <p className="text-xs text-[#6B6B6B] mt-1">{formData.description.length}/2000 characters</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                    Category *
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                    className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] bg-white"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                    Unit *
+                  </label>
+                  <select
+                    name="unit"
+                    value={formData.unit}
+                    onChange={handleChange}
+                    required
+                    className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] bg-white"
+                  >
+                    {units.map((unit) => (
+                      <option key={unit} value={unit}>{unit}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Quantity *
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                  placeholder="100"
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Location */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-[#ea7f61]" />
+              </div>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">Location</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  State *
+                </label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  required
+                  placeholder="Punjab"
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  District *
+                </label>
+                <input
+                  type="text"
+                  name="district"
+                  value={formData.district}
+                  onChange={handleChange}
+                  required
+                  placeholder="Ludhiana"
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Village
+                </label>
+                <input
+                  type="text"
+                  name="village"
+                  value={formData.village}
+                  onChange={handleChange}
+                  placeholder="Samrala"
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Dates */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-[#ea7f61]" />
+              </div>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">Dates</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Date of Entry *
+                </label>
+                <input
+                  type="date"
+                  name="dateOfEntry"
+                  value={formData.dateOfEntry}
+                  onChange={handleChange}
+                  required
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Expires At *
+                </label>
+                <input
+                  type="date"
+                  name="expiresAt"
+                  value={formData.expiresAt}
+                  onChange={handleChange}
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                <IndianRupee className="w-5 h-5 text-[#ea7f61]" />
+              </div>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">Pricing</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Minimum Price (₹) *
+                </label>
+                <input
+                  type="number"
+                  name="minPrice"
+                  value={formData.minPrice}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  placeholder="1000"
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
+                  Minimum Bid Increment (₹) *
+                </label>
+                <input
+                  type="number"
+                  name="minBidHop"
+                  value={formData.minBidHop}
+                  onChange={handleChange}
+                  required
+                  min="1"
+                  placeholder="50"
+                  className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Images */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
+                <ImageIcon className="w-5 h-5 text-[#ea7f61]" />
+              </div>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">Product Images</h2>
+            </div>
+
+            <div className="space-y-4">
+              <label className="block">
+                <div className="border-2 border-dashed border-[#E5DED3] rounded-xl p-8 text-center hover:border-[#ea7f61] transition-colors cursor-pointer bg-[#F5F2ED]/30">
+                  <Upload className="w-8 h-8 text-[#ea7f61] mx-auto mb-3" />
+                  <p className="text-sm font-bold text-[#2D2D2D] mb-1">
+                    Click to upload images
+                  </p>
+                  <p className="text-xs text-[#6B6B6B]">
+                    Max 5 images, up to 5MB each (JPG, PNG)
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="hidden"
+                    disabled={imageFiles.length >= 5}
+                  />
+                </div>
+              </label>
+
+              {imageFiles.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {imageFiles.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-28 object-cover rounded-xl border-2 border-[#E5DED3]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-lg transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/my-auctions')}
+              disabled={loading || uploading}
+              className="flex-1 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-3 px-6 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading || uploading}
+              className="flex-1 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading || uploading ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span>{uploading ? 'Uploading...' : 'Creating...'}</span>
+                </>
+              ) : (
+                'Create Auction'
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
