@@ -232,7 +232,7 @@ const AdminDashboard = () => {
                   <div className="p-6">
                     <div className="flex flex-col lg:flex-row gap-6">
                       {/* Image */}
-                      <div className="relative w-full lg:w-48 h-48 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                      <div className="relative w-full lg:w-48 h-48 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden shrink-0">
                         {auction.images?.[0] ? (
                           <img
                             src={auction.images[0].url}
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
                         {/* Info Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                               <User className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
@@ -278,7 +278,7 @@ const AdminDashboard = () => {
 
 
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                               <Package className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
@@ -289,7 +289,7 @@ const AdminDashboard = () => {
 
 
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                               <IndianRupee className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
@@ -300,7 +300,7 @@ const AdminDashboard = () => {
 
 
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                               <MapPin className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
@@ -313,7 +313,7 @@ const AdminDashboard = () => {
 
 
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                               <Calendar className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>

@@ -286,7 +286,7 @@ const MyAuctionsPage = () => {
                   <div className="p-6">
                     <div className="flex flex-col lg:flex-row gap-6">
                       {/* Image */}
-                      <div className="relative w-full lg:w-40 h-40 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                      <div className="relative w-full lg:w-40 h-40 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden shrink-0">
                         {auction.images && auction.images.length > 0 ? (
                           <img
                             src={auction.images[0].url}

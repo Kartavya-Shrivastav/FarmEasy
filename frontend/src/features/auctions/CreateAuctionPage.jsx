@@ -188,7 +188,7 @@ const CreateAuctionPage = () => {
 
         {/* Info Banner */}
         <div className="bg-blue-50 border-l-4 border-blue-500 rounded-xl p-4 mb-6 flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-blue-700 font-medium">{t('createAuction.reviewInfo')}</p>
             <p className="text-xs text-blue-600 mt-1">{t('createAuction.accuracyInfo')}</p>
@@ -199,7 +199,7 @@ const CreateAuctionPage = () => {
         {/* Error Alert */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 rounded-xl p-4 mb-6 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-red-700 font-medium">{error}</p>
             </div>

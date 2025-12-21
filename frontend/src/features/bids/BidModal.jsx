@@ -50,7 +50,7 @@ const BidModal = ({ isOpen, onClose, auction, onBidSuccess }) => {
     <Modal isOpen={isOpen} onClose={onClose} title={t('auction.placeBid')}>
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Auction Info */}
-        <div className="bg-gradient-to-br from-[#ea7f61] to-[#d85f3f] rounded-xl p-5 text-white">
+        <div className="bg-linear-to-br from-[#ea7f61] to-[#d85f3f] rounded-xl p-5 text-white">
           <div className="flex items-center gap-2 mb-3">
             <Gavel className="w-5 h-5" />
             <span className="text-sm font-medium opacity-90">Bidding on</span>
@@ -79,7 +79,7 @@ const BidModal = ({ isOpen, onClose, auction, onBidSuccess }) => {
 
         {/* Info Banner */}
         <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-blue-700 font-medium">Bid Increment: ₹{auction.minBidHop}</p>
             <p className="text-xs text-blue-600 mt-1">Your bid must be at least ₹{minAllowedBid.toLocaleString('en-IN')}</p>
@@ -89,7 +89,7 @@ const BidModal = ({ isOpen, onClose, auction, onBidSuccess }) => {
         {/* Error Alert */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
             <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}

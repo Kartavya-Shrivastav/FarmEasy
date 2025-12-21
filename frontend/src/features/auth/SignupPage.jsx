@@ -107,7 +107,7 @@ const SignupPage = () => {
               className="w-full h-full object-cover filter blur-sm"
             />
             {/* Dark Overlay for Text Readability */}
-            <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70"></div>
+            <div className="absolute inset-0 bg-linear-to-br from-black/70 via-black/60 to-black/70"></div>
           </div>
 
 

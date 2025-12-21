@@ -76,7 +76,7 @@ const PublicProfile = () => {
         {/* Profile Header */}
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-[#E5DED3] mb-6">
           <div className="flex items-start gap-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#ea7f61] to-[#d85f3f] flex items-center justify-center flex-shrink-0">
+            <div className="w-24 h-24 rounded-full bg-linear-to-br from-[#ea7f61] to-[#d85f3f] flex items-center justify-center shrink-0">
               <User className="w-12 h-12 text-white" />
             </div>
             <div className="flex-1">

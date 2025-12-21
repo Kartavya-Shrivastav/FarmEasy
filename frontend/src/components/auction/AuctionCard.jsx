@@ -47,7 +47,7 @@ const AuctionCard = ({ auction }) => {
     <Link to={`/auctions/${auction._id}`} className="block group">
       <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-[#E5DED3] group-hover:border-[#ea7f61]/30 h-full flex flex-col">
         {/* Image */}
-        <div className="relative h-52 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] overflow-hidden">
+        <div className="relative h-52 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] overflow-hidden">
           {auction.images && auction.images.length > 0 ? (
             <img
               src={auction.images[0].url}
@@ -61,7 +61,7 @@ const AuctionCard = ({ auction }) => {
           )}
           
           {/* Overlay Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
 
           {/* Category Badge */}

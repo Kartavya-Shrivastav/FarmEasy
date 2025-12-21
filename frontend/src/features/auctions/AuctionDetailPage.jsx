@@ -218,7 +218,7 @@ const AuctionDetailPage = () => {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3]">
+                  <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#F5F2ED] to-[#E5DED3]">
                     <span className="text-9xl">🌾</span>
                   </div>
                 )}
@@ -331,7 +331,7 @@ const AuctionDetailPage = () => {
 
 
               {/* Bidding Info Card */}
-              <div className="bg-gradient-to-br from-[#ea7f61] to-[#d85f3f] rounded-2xl shadow-xl p-6 text-white">
+              <div className="bg-linear-to-br from-[#ea7f61] to-[#d85f3f] rounded-2xl shadow-xl p-6 text-white">
                 <div className="flex items-center gap-2 mb-4">
                   <Gavel className="w-5 h-5" />
                   <span className="text-sm font-medium opacity-90">{t('auction.currentBid')}</span>
@@ -361,7 +361,7 @@ const AuctionDetailPage = () => {
               <div>
                 {isClosed ? (
                   <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-5 flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
                       <XCircle className="w-5 h-5 text-red-600" />
                     </div>
                     <div>
@@ -382,7 +382,7 @@ const AuctionDetailPage = () => {
                   </button>
                 ) : isAuthenticated && isFarmer ? (
                   <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5 flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                       <Info className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>

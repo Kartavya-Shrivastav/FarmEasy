@@ -191,7 +191,7 @@ const BuyerProfile = () => {
             >
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
                 <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-[#ea7f61] to-[#d85f3f] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-24 h-24 bg-linear-to-br from-[#ea7f61] to-[#d85f3f] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <User className="w-12 h-12 text-white" />
                   </div>
                   <h2 className="text-xl font-bold text-[#2D2D2D] mb-1">{profile?.name}</h2>
@@ -326,7 +326,7 @@ const BuyerProfile = () => {
                       >
                         <div className="p-6">
                           <div className="flex flex-col md:flex-row items-start gap-6">
-                            <div className="relative w-full md:w-32 h-32 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                            <div className="relative w-full md:w-32 h-32 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden shrink-0">
                               {auction.images?.[0] ? (
                                 <img
                                   src={auction.images[0].url}
@@ -430,7 +430,7 @@ const BuyerProfile = () => {
                         className={`bg-white rounded-2xl shadow-lg border-2 border-orange-200 overflow-hidden hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
                         style={isVisible ? { animation: `slideUp 0.6s ease-out ${0.4 + index * 0.1}s forwards` } : {}}
                       >
-                        <div className="bg-gradient-to-r from-orange-100 to-orange-50 px-4 py-2 border-b border-orange-200">
+                        <div className="bg-linear-to-r from-orange-100 to-orange-50 px-4 py-2 border-b border-orange-200">
                           <div className="flex items-center gap-2 text-orange-700 text-sm font-bold">
                             <AlertTriangle className="w-4 h-4" />
                             {t('profile.outbidMessage')}
@@ -438,7 +438,7 @@ const BuyerProfile = () => {
                         </div>
                         <div className="p-6">
                           <div className="flex flex-col md:flex-row items-start gap-6">
-                            <div className="relative w-full md:w-32 h-32 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                            <div className="relative w-full md:w-32 h-32 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden shrink-0">
                               {auction.images?.[0] ? (
                                 <img
                                   src={auction.images[0].url}
@@ -510,7 +510,7 @@ const BuyerProfile = () => {
                       >
                         <div className="p-6">
                           <div className="flex flex-col md:flex-row items-start gap-6">
-                            <div className="relative w-full md:w-32 h-32 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                            <div className="relative w-full md:w-32 h-32 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden shrink-0">
                               {auction.images?.[0] ? (
                                 <img
                                   src={auction.images[0].url}

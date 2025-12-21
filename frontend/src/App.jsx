@@ -200,7 +200,7 @@ const HomePage = () => {
 
           {/* Gradient Overlay */}
           <div
-            className="absolute inset-0 bg-gradient-to-r 
+            className="absolute inset-0 bg-linear-to-r 
             from-black/65 via-black/40 to-transparent"
           />
         </div>

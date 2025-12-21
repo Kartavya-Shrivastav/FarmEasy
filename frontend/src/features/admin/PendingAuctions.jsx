@@ -97,7 +97,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
             className="bg-white rounded-2xl shadow-lg border-2 border-amber-200 overflow-hidden hover:shadow-xl transition-all"
           >
             {/* Pending Badge Bar */}
-            <div className="bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-2 flex items-center justify-between">
+            <div className="bg-linear-to-r from-amber-400 to-amber-500 px-4 py-2 flex items-center justify-between">
               <div className="flex items-center gap-2 text-white">
                 <AlertCircle className="w-4 h-4" />
                 <span className="text-sm font-bold">{t('admin.pendingApprovalBadge')}</span>
@@ -109,7 +109,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Image */}
-                <div className="relative w-full md:w-40 h-40 bg-gradient-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden flex-shrink-0">
+                <div className="relative w-full md:w-40 h-40 bg-linear-to-br from-[#F5F2ED] to-[#E5DED3] rounded-xl overflow-hidden shrink-0">
                   {auction.images?.[0] ? (
                     <img
                       src={auction.images[0].url}
@@ -144,7 +144,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
                   {/* Info Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
@@ -157,7 +157,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
 
 
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                         <Tag className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
@@ -170,7 +170,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
 
 
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                         <Package className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
@@ -183,7 +183,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
 
 
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center shrink-0">
                         <IndianRupee className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>

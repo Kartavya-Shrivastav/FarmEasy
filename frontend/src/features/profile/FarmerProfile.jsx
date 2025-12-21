@@ -147,7 +147,7 @@ const FarmerProfile = () => {
             >
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
                 <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <div className="w-24 h-24 bg-linear-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <span className="text-5xl">🧑‍🌾</span>
                   </div>
                   <h2 className="text-xl font-bold text-[#2D2D2D] mb-1">{profile?.name}</h2>
@@ -167,7 +167,7 @@ const FarmerProfile = () => {
                 {/* Rating */}
                 {profile?.averageRating > 0 && (
                   <div className="border-t border-[#E5DED3] pt-6 mb-6">
-                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 text-center">
+                    <div className="bg-linear-to-br from-amber-50 to-yellow-50 rounded-xl p-4 text-center">
                       <div className="flex items-center justify-center gap-3 mb-2">
                         <Star className="w-8 h-8 fill-yellow-400 text-yellow-400" />
                         <span className="text-3xl font-bold text-[#2D2D2D]">
@@ -256,7 +256,7 @@ const FarmerProfile = () => {
               {/* Total Earnings - Only show for own profile */}
               {isOwnProfile && (
                 <div 
-                  className={`bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl shadow-lg p-6 border-2 border-yellow-300 hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                  className={`bg-linear-to-br from-amber-400 to-yellow-500 rounded-2xl shadow-lg p-6 border-2 border-yellow-300 hover:shadow-xl transition-all ${isVisible ? 'opacity-0' : 'opacity-0'}`}
                   style={isVisible ? { animation: 'slideUp 0.6s ease-out 0.45s forwards' } : {}}
                 >
                   <div className="flex items-center justify-between">

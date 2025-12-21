@@ -82,7 +82,7 @@ const Navbar = () => {
 
 
       <nav 
-        className={`bg-gradient-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+        className={`bg-linear-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
         style={isVisible ? {
           animation: 'slideDown 0.6s ease-out forwards'
         } : {}}
