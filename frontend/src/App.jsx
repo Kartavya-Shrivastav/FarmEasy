@@ -175,7 +175,7 @@ const HomePage = () => {
           }}
         >
           <img
-            src="src/assets/kissan1.jpg"
+            src="src/assets/kissan2.png"
             alt="Indian farmer with fresh vegetables"
             className="w-full h-full object-cover scale-105 filter blur-[3px]"
           />

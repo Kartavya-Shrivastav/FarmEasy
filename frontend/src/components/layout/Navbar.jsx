@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
@@ -12,6 +12,12 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation on mount
+    setIsVisible(true);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -30,166 +36,272 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2" onClick={closeMobileMenu}>
-            <span className="text-2xl">🌾</span>
-            <span className="text-xl font-bold text-[#d85f3f]">FarmEasy</span>
-          </Link>
+    <>
+      <style>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes slideInMobile {
+          from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            max-height: 500px;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link to="/marketplace" className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold transition-colors">
-              {t('nav.marketplace')}
+      <nav 
+        className={`bg-gradient-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+        style={isVisible ? {
+          animation: 'slideDown 0.6s ease-out forwards'
+        } : {}}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link 
+              to="/" 
+              className={`flex items-center gap-2 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+              onClick={closeMobileMenu}
+              style={isVisible ? {
+                animation: 'fadeIn 0.6s ease-out 0.2s forwards'
+              } : {}}
+            >
+              <span className="text-2xl">🌾</span>
+              <span className="text-xl font-bold text-[#ea7f61]">FarmEasy</span>
             </Link>
-            
-            {isAuthenticated && (
-              <>
-                <Link to="/profile" className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold transition-colors">
-                  {t('nav.myProfile')}
-                </Link>
-                
-                {user?.role === 'farmer' && (
-                  <Link to="/my-auctions" className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold transition-colors">
-                    My Auctions
-                  </Link>
-                )}
-                
-                {user?.role === 'admin' && (
-                  <Link to="/admin" className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold transition-colors">
-                    {t('nav.admin')}
-                  </Link>
-                )}
-              </>
-            )}
-          </div>
 
-          {/* Desktop Right Side */}
-          <div className="hidden md:flex items-center gap-4">
-            <LanguageSwitcher />
-            
-            {isAuthenticated ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-[#5A5A5A] font-medium">
-                  {user?.name}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-white hover:bg-[#fff5f2] text-[#2D2D2D] font-semibold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]/40 shadow-sm"
-                >
-                  {t('nav.logout')}
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link to="/login" className="bg-white hover:bg-[#fff5f2] text-[#2D2D2D] font-semibold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]/40 shadow-sm">
-                  {t('nav.login')}
-                </Link>
-                <Link to="/signup" className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 shadow-md">
-                  {t('nav.signup')}
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Hamburger Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-[#2D2D2D] hover:text-[#ea7f61] focus:outline-none"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#ea7f61]/30 py-4 bg-white/60 backdrop-blur-md rounded-b-xl shadow-lg">
-            <div className="flex flex-col space-y-3">
-              <Link
-                to="/marketplace"
-                onClick={closeMobileMenu}
-                className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold py-2 px-4 hover:bg-white/80 rounded-xl transition-colors"
+            {/* Desktop Nav Links */}
+            <div className="hidden md:flex items-center gap-6">
+              <Link 
+                to="/marketplace" 
+                className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                style={isVisible ? {
+                  animation: 'fadeIn 0.6s ease-out 0.3s forwards'
+                } : {}}
               >
                 {t('nav.marketplace')}
               </Link>
               
               {isAuthenticated && (
                 <>
-                  <Link
-                    to="/profile"
-                    onClick={closeMobileMenu}
-                    className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold py-2 px-4 hover:bg-white/80 rounded-xl transition-colors"
+                  <Link 
+                    to="/profile" 
+                    className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                    style={isVisible ? {
+                      animation: 'fadeIn 0.6s ease-out 0.4s forwards'
+                    } : {}}
                   >
                     {t('nav.myProfile')}
                   </Link>
                   
                   {user?.role === 'farmer' && (
-                    <Link
-                      to="/my-auctions"
-                      onClick={closeMobileMenu}
-                      className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold py-2 px-4 hover:bg-white/80 rounded-xl transition-colors"
+                    <Link 
+                      to="/my-auctions" 
+                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      style={isVisible ? {
+                        animation: 'fadeIn 0.6s ease-out 0.5s forwards'
+                      } : {}}
                     >
                       My Auctions
                     </Link>
                   )}
                   
                   {user?.role === 'admin' && (
-                    <Link
-                      to="/admin"
-                      onClick={closeMobileMenu}
-                      className="text-[#2D2D2D] hover:text-[#ea7f61] font-semibold py-2 px-4 hover:bg-white/80 rounded-xl transition-colors"
+                    <Link 
+                      to="/admin" 
+                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      style={isVisible ? {
+                        animation: 'fadeIn 0.6s ease-out 0.5s forwards'
+                      } : {}}
                     >
                       {t('nav.admin')}
                     </Link>
                   )}
                 </>
               )}
+            </div>
 
-              <div className="border-t border-[#ea7f61]/30 pt-3 px-4">
+            {/* Desktop Right Side */}
+            <div className="hidden md:flex items-center gap-4">
+              <div 
+                className={`${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                style={isVisible ? {
+                  animation: 'fadeIn 0.6s ease-out 0.4s forwards'
+                } : {}}
+              >
                 <LanguageSwitcher />
               </div>
-
+              
               {isAuthenticated ? (
-                <div className="border-t border-[#ea7f61]/30 pt-3 px-4 space-y-2">
-                  <p className="text-sm text-[#5A5A5A] font-medium">Logged in as: {user?.name}</p>
+                <div className="flex items-center gap-4">
+                  <span 
+                    className={`text-sm text-[#3a3a3a] font-bold ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                    style={isVisible ? {
+                      animation: 'fadeIn 0.6s ease-out 0.5s forwards'
+                    } : {}}
+                  >
+                    {user?.name}
+                  </span>
                   <button
                     onClick={handleLogout}
-                    className="w-full bg-white hover:bg-[#fff5f2] text-[#2D2D2D] font-semibold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]/40"
+                    className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                    style={isVisible ? {
+                      animation: 'fadeIn 0.6s ease-out 0.6s forwards'
+                    } : {}}
                   >
                     {t('nav.logout')}
                   </button>
                 </div>
               ) : (
-                <div className="border-t border-[#ea7f61]/30 pt-3 px-4 flex flex-col gap-2">
-                  <Link
-                    to="/login"
-                    onClick={closeMobileMenu}
-                    className="text-center bg-white hover:bg-[#fff5f2] text-[#2D2D2D] font-semibold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]/40"
+                <div className="flex items-center gap-2">
+                  <Link 
+                    to="/login" 
+                    className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                    style={isVisible ? {
+                      animation: 'fadeIn 0.6s ease-out 0.5s forwards'
+                    } : {}}
                   >
                     {t('nav.login')}
                   </Link>
-                  <Link
-                    to="/signup"
-                    onClick={closeMobileMenu}
-                    className="text-center bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 shadow-md"
+                  <Link 
+                    to="/signup" 
+                    className={`bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                    style={isVisible ? {
+                      animation: 'fadeIn 0.6s ease-out 0.6s forwards'
+                    } : {}}
                   >
                     {t('nav.signup')}
                   </Link>
                 </div>
               )}
             </div>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`md:hidden text-[#1a1a1a] hover:text-[#ea7f61] focus:outline-none ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+              style={isVisible ? {
+                animation: 'fadeIn 0.6s ease-out 0.3s forwards'
+              } : {}}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
           </div>
-        )}
-      </div>
-    </nav>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div 
+              className="md:hidden border-t border-[#ea7f61]/30 py-4 bg-white/80 backdrop-blur-md rounded-b-xl shadow-lg overflow-hidden"
+              style={{
+                animation: 'slideInMobile 0.3s ease-out forwards'
+              }}
+            >
+              <div className="flex flex-col space-y-3">
+                <Link
+                  to="/marketplace"
+                  onClick={closeMobileMenu}
+                  className="text-[#1a1a1a] hover:text-[#ea7f61] font-bold py-2 px-4 hover:bg-white rounded-xl transition-colors"
+                >
+                  {t('nav.marketplace')}
+                </Link>
+                
+                {isAuthenticated && (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={closeMobileMenu}
+                      className="text-[#1a1a1a] hover:text-[#ea7f61] font-bold py-2 px-4 hover:bg-white rounded-xl transition-colors"
+                    >
+                      {t('nav.myProfile')}
+                    </Link>
+                    
+                    {user?.role === 'farmer' && (
+                      <Link
+                        to="/my-auctions"
+                        onClick={closeMobileMenu}
+                        className="text-[#1a1a1a] hover:text-[#ea7f61] font-bold py-2 px-4 hover:bg-white rounded-xl transition-colors"
+                      >
+                        My Auctions
+                      </Link>
+                    )}
+                    
+                    {user?.role === 'admin' && (
+                      <Link
+                        to="/admin"
+                        onClick={closeMobileMenu}
+                        className="text-[#1a1a1a] hover:text-[#ea7f61] font-bold py-2 px-4 hover:bg-white rounded-xl transition-colors"
+                      >
+                        {t('nav.admin')}
+                      </Link>
+                    )}
+                  </>
+                )}
+
+                <div className="border-t border-[#ea7f61]/30 pt-3 px-4">
+                  <LanguageSwitcher />
+                </div>
+
+                {isAuthenticated ? (
+                  <div className="border-t border-[#ea7f61]/30 pt-3 px-4 space-y-2">
+                    <p className="text-sm text-[#3a3a3a] font-bold">Logged in as: {user?.name}</p>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]"
+                    >
+                      {t('nav.logout')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-t border-[#ea7f61]/30 pt-3 px-4 flex flex-col gap-2">
+                    <Link
+                      to="/login"
+                      onClick={closeMobileMenu}
+                      className="text-center bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]"
+                    >
+                      {t('nav.login')}
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={closeMobileMenu}
+                      className="text-center bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md"
+                    >
+                      {t('nav.signup')}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+    </>
   );
 };
 
