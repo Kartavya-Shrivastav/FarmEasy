@@ -2,32 +2,46 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Package, Clock, TrendingUp, Image as ImageIcon, Calendar } from 'lucide-react';
 
+
 const AuctionCard = ({ auction }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
+    return new Date(date).toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
     });
   };
 
+
   const getTimeRemaining = (endDate) => {
     const now = new Date();
     const end = new Date(endDate);
     const diff = end - now;
 
-    if (diff <= 0) return { text: 'Ended', urgent: false };
+
+    if (diff <= 0) return { text: t('auction.ended'), urgent: false };
+
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
-    if (days > 0) return { text: `${days}d ${hours}h left`, urgent: days < 2 };
-    return { text: `${hours}h left`, urgent: true };
+
+    if (days > 0) return { 
+      text: t('time.daysHoursLeft', { days, hours }), 
+      urgent: days < 2 
+    };
+    return { 
+      text: t('time.hoursLeft', { hours }), 
+      urgent: true 
+    };
   };
 
+
   const timeRemaining = getTimeRemaining(auction.auctionEndsAt);
+
 
   return (
     <Link to={`/auctions/${auction._id}`} className="block group">
@@ -49,9 +63,10 @@ const AuctionCard = ({ auction }) => {
           {/* Overlay Gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
+
           {/* Category Badge */}
           <div className="absolute top-3 left-3 bg-[#ea7f61] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
-            {auction.category}
+            {t(`categories.${auction.category.toLowerCase()}`, auction.category)}
           </div>
           
           {/* Image Count Badge */}
@@ -62,14 +77,16 @@ const AuctionCard = ({ auction }) => {
             </div>
           )}
 
+
           {/* Time Remaining Badge */}
-          {timeRemaining.text !== 'Ended' && (
+          {timeRemaining.text !== t('auction.ended') && (
             <div className={`absolute bottom-3 right-3 ${timeRemaining.urgent ? 'bg-red-500' : 'bg-green-500'} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-1.5 animate-pulse`}>
               <Clock className="w-3.5 h-3.5" />
               {timeRemaining.text}
             </div>
           )}
         </div>
+
 
         {/* Content */}
         <div className="p-5 flex-1 flex flex-col">
@@ -78,17 +95,19 @@ const AuctionCard = ({ auction }) => {
             {auction.title}
           </h3>
 
+
           {/* Info Row */}
           <div className="flex items-center gap-3 mb-4">
             <div className="flex items-center gap-1.5 text-sm text-[#6B6B6B] bg-[#F5F2ED] px-3 py-1.5 rounded-lg">
               <Package className="w-4 h-4 text-[#ea7f61]" />
-              <span className="font-medium">{auction.quantity} {auction.unit}</span>
+              <span className="font-medium">{auction.quantity} {t(`units.${auction.unit.toLowerCase()}`, auction.unit)}</span>
             </div>
             <div className="flex items-center gap-1.5 text-sm text-[#6B6B6B] bg-[#F5F2ED] px-3 py-1.5 rounded-lg flex-1">
               <MapPin className="w-4 h-4 text-[#ea7f61]" />
               <span className="font-medium truncate">{auction.location?.district || 'N/A'}</span>
             </div>
           </div>
+
 
           {/* Divider */}
           <div className="border-t border-[#E5DED3] pt-4 mt-auto">
@@ -99,9 +118,10 @@ const AuctionCard = ({ auction }) => {
                 <span>{t('auction.currentBid')}</span>
               </div>
               <span className="text-2xl font-bold text-[#ea7f61]">
-                ₹{(auction.currentHighestBidAmount || auction.minPrice).toLocaleString('en-IN')}
+                ₹{(auction.currentHighestBidAmount || auction.minPrice).toLocaleString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}
               </span>
             </div>
+
 
             {/* End Date */}
             <div className="flex items-center justify-between text-sm">
@@ -115,10 +135,11 @@ const AuctionCard = ({ auction }) => {
             </div>
           </div>
 
+
           {/* Hover CTA */}
           <div className="mt-4 pt-4 border-t border-[#E5DED3] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="flex items-center justify-center gap-2 text-[#ea7f61] font-bold text-sm">
-              <span>View Details</span>
+              <span>{t('auction.viewDetails')}</span>
               <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
             </div>
           </div>
@@ -127,5 +148,6 @@ const AuctionCard = ({ auction }) => {
     </Link>
   );
 };
+
 
 export default AuctionCard;

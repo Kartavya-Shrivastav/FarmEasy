@@ -10,6 +10,7 @@ import api from '../../services/api';
 import { showSuccess, showError } from '../../utils/toast';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 
+
 const LoginPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -23,19 +24,23 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
 
     try {
       const { data } = await api.post('/auth/login', formData);
@@ -43,18 +48,20 @@ const LoginPage = () => {
       if (data.success) {
         localStorage.setItem('accessToken', data.accessToken);
         dispatch(setUser(data.user));
-        showSuccess(`Welcome back, ${data.user.name}!`);
+        showSuccess(t('auth.welcomeBack', { name: data.user.name }));
         navigate('/marketplace');
       }
 
+
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Login failed';
+      const errorMsg = err.response?.data?.message || t('auth.loginError');
       setError(errorMsg);
       showError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <>
@@ -85,6 +92,7 @@ const LoginPage = () => {
         }
       `}</style>
 
+
       <div className="min-h-[calc(100vh-4rem)] flex bg-[#F5F2ED]">
         {/* Left Side - Image/Info */}
         <div 
@@ -104,45 +112,49 @@ const LoginPage = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70"></div>
           </div>
 
+
           {/* Decorative Elements */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3" />
           </div>
 
+
           <div className="relative z-10 text-white max-w-md">
             <div className="mb-8">
               <span className="text-6xl mb-6 block drop-shadow-lg">🌾</span>
               <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
-                Welcome Back to FarmEasy
+                {t('auth.welcomeBackTitle')}
               </h1>
               <p className="text-lg text-white/95 drop-shadow-md">
-                Continue your journey to better prices and transparent agricultural trading.
+                {t('auth.welcomeBackSubtitle')}
               </p>
             </div>
+
 
             <div className="space-y-4 mt-8">
               <div className="flex items-center gap-3 backdrop-blur-sm bg-white/10 rounded-lg p-3">
                 <div className="w-10 h-10 rounded-full bg-[#ea7f61] flex items-center justify-center shrink-0">
                   <span className="text-2xl">✓</span>
                 </div>
-                <p className="text-white drop-shadow-md">Access your active auctions</p>
+                <p className="text-white drop-shadow-md">{t('auth.featureAccessAuctions')}</p>
               </div>
               <div className="flex items-center gap-3 backdrop-blur-sm bg-white/10 rounded-lg p-3">
                 <div className="w-10 h-10 rounded-full bg-[#ea7f61] flex items-center justify-center shrink-0">
                   <span className="text-2xl">✓</span>
                 </div>
-                <p className="text-white drop-shadow-md">Track your bids and sales</p>
+                <p className="text-white drop-shadow-md">{t('auth.featureTrackBids')}</p>
               </div>
               <div className="flex items-center gap-3 backdrop-blur-sm bg-white/10 rounded-lg p-3">
                 <div className="w-10 h-10 rounded-full bg-[#ea7f61] flex items-center justify-center shrink-0">
                   <span className="text-2xl">✓</span>
                 </div>
-                <p className="text-white drop-shadow-md">Connect with verified buyers</p>
+                <p className="text-white drop-shadow-md">{t('auth.featureConnectBuyers')}</p>
               </div>
             </div>
           </div>
         </div>
+
 
         {/* Right Side - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
@@ -158,15 +170,17 @@ const LoginPage = () => {
               <h2 className="text-2xl font-bold text-[#2D2D2D] mt-2">FarmEasy</h2>
             </div>
 
+
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#E5DED3]">
               <div className="mb-8">
                 <h2 className="text-3xl font-bold text-[#2D2D2D] mb-2">
                   {t('auth.loginTitle')}
                 </h2>
                 <p className="text-[#6B6B6B]">
-                  Enter your credentials to access your account
+                  {t('auth.loginSubtitle')}
                 </p>
               </div>
+
 
               {error && (
                 <div 
@@ -175,10 +189,11 @@ const LoginPage = () => {
                     animation: 'slideInRight 0.3s ease-out'
                   }}
                 >
-                  <p className="font-medium">Error</p>
+                  <p className="font-medium">{t('common.error')}</p>
                   <p className="text-sm">{error}</p>
                 </div>
               )}
+
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email Input */}
@@ -194,11 +209,12 @@ const LoginPage = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      placeholder="farmer@example.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       className="w-full pl-11 pr-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
+
 
                 {/* Password Input */}
                 <div>
@@ -219,6 +235,7 @@ const LoginPage = () => {
                   </div>
                 </div>
 
+
                 {/* Forgot Password */}
                 <div className="flex items-center justify-between">
                   <label className="flex items-center">
@@ -226,12 +243,13 @@ const LoginPage = () => {
                       type="checkbox"
                       className="w-4 h-4 text-[#ea7f61] border-gray-300 rounded focus:ring-[#ea7f61]"
                     />
-                    <span className="ml-2 text-sm text-[#6B6B6B]">Remember me</span>
+                    <span className="ml-2 text-sm text-[#6B6B6B]">{t('auth.rememberMe')}</span>
                   </label>
                   <Link to="/forgot-password" className="text-sm text-[#ea7f61] hover:text-[#d85f3f] font-medium">
-                    Forgot password?
+                    {t('auth.forgotPassword')}
                   </Link>
                 </div>
+
 
                 {/* Submit Button */}
                 <button
@@ -250,29 +268,32 @@ const LoginPage = () => {
                 </button>
               </form>
 
+
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-[#E5DED3]"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-[#6B6B6B]">or</span>
+                  <span className="px-4 bg-white text-[#6B6B6B]">{t('common.or')}</span>
                 </div>
               </div>
+
 
               {/* Sign Up Link */}
               <p className="text-center text-[#6B6B6B]">
                 {t('auth.noAccount')}{' '}
                 <Link to="/signup" className="text-[#ea7f61] hover:text-[#d85f3f] font-bold">
-                  {t('auth.signupButton')}
+                  {t('auth.signupLink')}
                 </Link>
               </p>
             </div>
 
+
             {/* Back to Home */}
             <div className="text-center mt-6">
               <Link to="/" className="text-sm text-[#6B6B6B] hover:text-[#2D2D2D] flex items-center justify-center gap-2">
-                <span>←</span> Back to Home
+                <span>←</span> {t('common.backToHome')}
               </Link>
             </div>
           </div>
@@ -281,5 +302,6 @@ const LoginPage = () => {
     </>
   );
 };
+
 
 export default LoginPage;

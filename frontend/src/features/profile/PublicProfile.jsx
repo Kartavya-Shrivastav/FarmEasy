@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, User, Star, Package } from 'lucide-react';
 import api from '../../services/api';
 
+
 const PublicProfile = () => {
+  const { t, i18n } = useTranslation();
   const { userId } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     fetchProfile();
   }, [userId]);
+
 
   const fetchProfile = async () => {
     try {
@@ -26,32 +31,35 @@ const PublicProfile = () => {
     }
   };
 
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-[#6B6B6B] font-medium">Loading profile...</p>
+          <p className="text-[#6B6B6B] font-medium">{t('publicProfile.loading')}</p>
         </div>
       </div>
     );
   }
 
+
   if (!profile) {
     return (
       <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4">Profile not found</h2>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4">{t('publicProfile.notFound')}</h2>
           <button
             onClick={() => navigate(-1)}
             className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-6 rounded-xl transition-all"
           >
-            Go Back
+            {t('publicProfile.goBack')}
           </button>
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-[#F5F2ED] py-8">
@@ -61,8 +69,9 @@ const PublicProfile = () => {
           className="inline-flex items-center gap-2 text-[#6B6B6B] hover:text-[#ea7f61] font-bold mb-6 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          Back
+          {t('common.back')}
         </button>
+
 
         {/* Profile Header */}
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-[#E5DED3] mb-6">
@@ -74,13 +83,15 @@ const PublicProfile = () => {
               <h1 className="text-4xl font-bold text-[#2D2D2D] mb-2">{profile.name}</h1>
               <div className="flex items-center gap-4 mb-3">
                 <span className="inline-block bg-[#ea7f61]/10 text-[#ea7f61] px-4 py-1 rounded-full text-sm font-bold capitalize">
-                  {profile.role}
+                  {t(`publicProfile.role.${profile.role}`)}
                 </span>
                 {profile.averageRating > 0 && (
                   <div className="flex items-center gap-1.5 bg-yellow-50 px-3 py-1 rounded-full">
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     <span className="font-bold text-[#2D2D2D]">{profile.averageRating.toFixed(1)}</span>
-                    <span className="text-sm text-[#6B6B6B]">({profile.totalReviews} reviews)</span>
+                    <span className="text-sm text-[#6B6B6B]">
+                      ({t('publicProfile.reviewCount', { count: profile.totalReviews })})
+                    </span>
                   </div>
                 )}
               </div>
@@ -88,12 +99,13 @@ const PublicProfile = () => {
           </div>
         </div>
 
+
         {/* Farmer's Successful Auctions */}
         {profile.role === 'farmer' && profile.auctions && profile.auctions.length > 0 && (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3] mb-6">
             <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4 flex items-center gap-2">
               <Package className="w-6 h-6 text-[#ea7f61]" />
-              Successful Auctions
+              {t('publicProfile.successfulAuctions')}
             </h2>
             <div className="space-y-3">
               {profile.auctions.map((auction) => (
@@ -106,15 +118,15 @@ const PublicProfile = () => {
                     <div>
                       <h3 className="font-bold text-[#2D2D2D] mb-1">{auction.title}</h3>
                       <p className="text-sm text-[#6B6B6B]">
-                        {auction.category} • {auction.quantity} units
+                        {auction.category} • {auction.quantity} {t('publicProfile.units')}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-[#ea7f61]">
-                        ₹{auction.lockedDeal?.amount?.toLocaleString('en-IN')}
+                        ₹{auction.lockedDeal?.amount?.toLocaleString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}
                       </p>
                       <p className="text-xs text-[#6B6B6B]">
-                        {new Date(auction.lockedDeal?.lockedAt).toLocaleDateString('en-IN')}
+                        {new Date(auction.lockedDeal?.lockedAt).toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}
                       </p>
                     </div>
                   </div>
@@ -124,12 +136,13 @@ const PublicProfile = () => {
           </div>
         )}
 
+
         {/* Reviews */}
         {profile.reviews && profile.reviews.length > 0 && (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
             <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4 flex items-center gap-2">
               <Star className="w-6 h-6 text-[#ea7f61]" />
-              Reviews
+              {t('publicProfile.reviews')}
             </h2>
             <div className="space-y-4">
               {profile.reviews.map((review) => (
@@ -148,7 +161,7 @@ const PublicProfile = () => {
                       ))}
                     </div>
                     <span className="text-sm text-[#6B6B6B]">
-                      by {review.buyer?.name || 'Anonymous'}
+                      {t('publicProfile.reviewBy', { name: review.buyer?.name || t('publicProfile.anonymous') })}
                     </span>
                   </div>
                   {review.comment && (
@@ -156,7 +169,7 @@ const PublicProfile = () => {
                   )}
                   {review.auction && (
                     <p className="text-xs text-[#6B6B6B] mt-2">
-                      For: {review.auction.title}
+                      {t('publicProfile.forAuction', { title: review.auction.title })}
                     </p>
                   )}
                 </div>
@@ -165,10 +178,11 @@ const PublicProfile = () => {
           </div>
         )}
 
+
         {/* Buyer's Purchases */}
         {profile.role === 'buyer' && profile.purchases && profile.purchases.length > 0 && (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
-            <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4">Successful Purchases</h2>
+            <h2 className="text-2xl font-bold text-[#2D2D2D] mb-4">{t('publicProfile.successfulPurchases')}</h2>
             <div className="space-y-3">
               {profile.purchases.map((purchase) => (
                 <div
@@ -177,7 +191,7 @@ const PublicProfile = () => {
                 >
                   <h3 className="font-bold text-[#2D2D2D] mb-1">{purchase.title}</h3>
                   <p className="text-sm text-[#6B6B6B]">
-                    From: {purchase.farmer?.name} • {purchase.category}
+                    {t('publicProfile.fromFarmer', { name: purchase.farmer?.name })} • {purchase.category}
                   </p>
                 </div>
               ))}
@@ -188,5 +202,6 @@ const PublicProfile = () => {
     </div>
   );
 };
+
 
 export default PublicProfile;

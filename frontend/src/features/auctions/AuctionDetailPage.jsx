@@ -23,18 +23,21 @@ import {
   Info
 } from 'lucide-react';
 
+
 const AuctionDetailPage = () => {
   const { id } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { currentAuction } = useAppSelector((state) => state.auctions);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
+
   const [loading, setLoading] = useState(true);
   const [bidModalOpen, setBidModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+
 
   useEffect(() => {
     setIsVisible(true);
@@ -44,7 +47,9 @@ const AuctionDetailPage = () => {
     const socket = initSocket();
     connectSocket();
 
+
     socket.emit('join-auction', id);
+
 
     // Listen for real-time bid updates
     socket.on('new-bid', (data) => {
@@ -53,11 +58,13 @@ const AuctionDetailPage = () => {
       }
     });
 
+
     socket.on('auction-closed', (data) => {
       if (data.auctionId === id) {
         fetchAuction(); // Refresh to show closed status
       }
     });
+
 
     return () => {
       socket.emit('leave-auction', id);
@@ -65,6 +72,7 @@ const AuctionDetailPage = () => {
       socket.off('auction-closed');
     };
   }, [id]);
+
 
   const fetchAuction = async () => {
     setLoading(true);
@@ -80,43 +88,59 @@ const AuctionDetailPage = () => {
     }
   };
 
+
   const handlePlaceBid = async (amount) => {
     try {
       const { data } = await api.post(`/${id}/bids`, { amount });
       if (data.success) {
-        showSuccess('Bid placed successfully!');
+        showSuccess(t('bid.bidSuccess'));
       }
     } catch (error) {
       throw error;
     }
   };
 
+
   const getTimeRemaining = (endDate) => {
     const now = new Date();
     const end = new Date(endDate);
     const diff = end - now;
 
-    if (diff <= 0) return { text: 'Ended', urgent: false };
+
+    if (diff <= 0) return { text: t('auction.ended'), urgent: false };
+
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-    if (days > 0) return { text: `${days}d ${hours}h ${minutes}m`, urgent: days < 2 };
-    if (hours > 0) return { text: `${hours}h ${minutes}m`, urgent: true };
-    return { text: `${minutes}m`, urgent: true };
+
+    if (days > 0) return { 
+      text: t('time.daysHoursMinutes', { days, hours, minutes }), 
+      urgent: days < 2 
+    };
+    if (hours > 0) return { 
+      text: t('time.hoursMinutes', { hours, minutes }), 
+      urgent: true 
+    };
+    return { 
+      text: t('time.minutesShort', { minutes }), 
+      urgent: true 
+    };
   };
+
 
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-[#6B6B6B] font-medium">Loading auction details...</p>
+          <p className="text-[#6B6B6B] font-medium">{t('auctionDetail.loading')}</p>
         </div>
       </div>
     );
   }
+
 
   if (!currentAuction) {
     return (
@@ -125,23 +149,25 @@ const AuctionDetailPage = () => {
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <XCircle className="w-10 h-10 text-red-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">Auction not found</h2>
-          <p className="text-[#6B6B6B] mb-6">The auction you're looking for doesn't exist or has been removed.</p>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">{t('auctionDetail.notFound')}</h2>
+          <p className="text-[#6B6B6B] mb-6">{t('auctionDetail.notFoundMessage')}</p>
           <button
             onClick={() => navigate('/marketplace')}
             className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
           >
-            Back to Marketplace
+            {t('common.backToMarketplace')}
           </button>
         </div>
       </div>
     );
   }
 
+
   const isBuyer = user?.role === 'buyer';
   const isFarmer = user?.role === 'farmer' && currentAuction.farmer._id === user._id;
   const isClosed = currentAuction.status === 'CLOSED' || currentAuction.lockedDeal?.isLocked;
   const timeRemaining = getTimeRemaining(currentAuction.auctionEndsAt);
+
 
   return (
     <>
@@ -162,6 +188,7 @@ const AuctionDetailPage = () => {
         }
       `}</style>
 
+
       <div className="min-h-screen bg-[#F5F2ED]">
         <div className="container mx-auto px-4 py-8">
           {/* Back Button */}
@@ -170,8 +197,9 @@ const AuctionDetailPage = () => {
             className="inline-flex items-center gap-2 text-[#6B6B6B] hover:text-[#ea7f61] font-bold mb-6 transition-colors group"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            Back to Marketplace
+            {t('common.backToMarketplace')}
           </button>
+
 
           <div 
             className={`grid grid-cols-1 lg:grid-cols-2 gap-8 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
@@ -195,14 +223,15 @@ const AuctionDetailPage = () => {
                   </div>
                 )}
 
+
                 {/* Overlay Badges */}
                 <div className="absolute top-4 left-4 flex gap-2">
                   <span className="bg-[#ea7f61] text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm">
-                    {currentAuction.category}
+                    {t(`categories.${currentAuction.category.toLowerCase()}`, currentAuction.category)}
                   </span>
                   {isClosed ? (
                     <span className="bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm">
-                      Closed
+                      {t('auction.closed')}
                     </span>
                   ) : (
                     <span className={`${timeRemaining.urgent ? 'bg-red-500 animate-pulse' : 'bg-green-500'} text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-1.5`}>
@@ -212,6 +241,7 @@ const AuctionDetailPage = () => {
                   )}
                 </div>
               </div>
+
 
               {/* Thumbnail Gallery */}
               {currentAuction.images && currentAuction.images.length > 1 && (
@@ -237,6 +267,7 @@ const AuctionDetailPage = () => {
               )}
             </div>
 
+
             {/* Right Column - Details */}
             <div className="space-y-6">
               {/* Title Card */}
@@ -249,6 +280,7 @@ const AuctionDetailPage = () => {
                 </p>
               </div>
 
+
               {/* Details Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white rounded-2xl shadow-lg p-5 border border-[#E5DED3]">
@@ -259,9 +291,10 @@ const AuctionDetailPage = () => {
                     <span className="text-sm text-[#6B6B6B] font-medium">{t('auction.quantity')}</span>
                   </div>
                   <p className="text-2xl font-bold text-[#2D2D2D] ml-13">
-                    {currentAuction.quantity} {currentAuction.unit}
+                    {currentAuction.quantity} {t(`units.${currentAuction.unit.toLowerCase()}`, currentAuction.unit)}
                   </p>
                 </div>
+
 
                 <div className="bg-white rounded-2xl shadow-lg p-5 border border-[#E5DED3]">
                   <div className="flex items-center gap-3 mb-2">
@@ -276,6 +309,7 @@ const AuctionDetailPage = () => {
                 </div>
               </div>
 
+
               {/* Farmer Info - Clickable */}
               <button
                 onClick={() => navigate(`/profile/${currentAuction.farmer._id}`)}
@@ -286,13 +320,14 @@ const AuctionDetailPage = () => {
                     <User className="w-6 h-6 text-[#ea7f61]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm text-[#6B6B6B]">Seller (Click to view profile)</p>
+                    <p className="text-sm text-[#6B6B6B]">{t('auctionDetail.sellerClickToView')}</p>
                     <p className="text-lg font-bold text-[#2D2D2D] group-hover:text-[#ea7f61] transition-colors">
-                      {currentAuction.farmer?.name || 'N/A'}
+                      {currentAuction.farmer?.name || t('auctionDetail.notAvailable')}
                     </p>
                   </div>
                 </div>
               </button>
+
 
 
               {/* Bidding Info Card */}
@@ -302,17 +337,17 @@ const AuctionDetailPage = () => {
                   <span className="text-sm font-medium opacity-90">{t('auction.currentBid')}</span>
                 </div>
                 <div className="text-5xl font-bold mb-6">
-                  ₹{(currentAuction.currentHighestBidAmount || currentAuction.minPrice).toLocaleString('en-IN')}
+                  ₹{(currentAuction.currentHighestBidAmount || currentAuction.minPrice).toLocaleString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
                   <div>
-                    <p className="text-xs opacity-75 mb-1">Min Increment</p>
-                    <p className="text-lg font-bold">₹{currentAuction.minBidHop}</p>
+                    <p className="text-xs opacity-75 mb-1">{t('auctionDetail.minIncrement')}</p>
+                    <p className="text-lg font-bold">₹{currentAuction.minBidHop.toLocaleString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}</p>
                   </div>
                   <div>
-                    <p className="text-xs opacity-75 mb-1">Ends On</p>
+                    <p className="text-xs opacity-75 mb-1">{t('auctionDetail.endsOn')}</p>
                     <p className="text-lg font-bold">
-                      {new Date(currentAuction.auctionEndsAt).toLocaleDateString('en-IN', {
+                      {new Date(currentAuction.auctionEndsAt).toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN', {
                         day: 'numeric',
                         month: 'short'
                       })}
@@ -320,6 +355,7 @@ const AuctionDetailPage = () => {
                   </div>
                 </div>
               </div>
+
 
               {/* Action Buttons */}
               <div>
@@ -329,10 +365,10 @@ const AuctionDetailPage = () => {
                       <XCircle className="w-5 h-5 text-red-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-red-700 mb-1">Auction Closed</p>
-                      <p className="text-sm text-red-600">This auction has ended and is no longer accepting bids.</p>
+                      <p className="font-bold text-red-700 mb-1">{t('auction.auctionClosed')}</p>
+                      <p className="text-sm text-red-600">{t('auction.auctionClosedMessage')}</p>
                       {currentAuction.lockedDeal?.isPaid && (
-                        <p className="text-sm text-red-600 mt-2">✓ Payment completed</p>
+                        <p className="text-sm text-red-600 mt-2">{t('auction.paymentCompleted')}</p>
                       )}
                     </div>
                   </div>
@@ -350,8 +386,8 @@ const AuctionDetailPage = () => {
                       <Info className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-blue-700 mb-1">Your Auction</p>
-                      <p className="text-sm text-blue-600">You are the seller of this auction. You cannot place bids on your own listing.</p>
+                      <p className="font-bold text-blue-700 mb-1">{t('auction.yourAuction')}</p>
+                      <p className="text-sm text-blue-600">{t('auction.yourAuctionMessage')}</p>
                     </div>
                   </div>
                 ) : (
@@ -360,10 +396,10 @@ const AuctionDetailPage = () => {
                       onClick={() => navigate('/login')}
                       className="w-full bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
                     >
-                      Login as Buyer to Bid
+                      {t('auction.loginToBid')}
                     </button>
                     <p className="text-center text-sm text-[#6B6B6B]">
-                      Don't have an account? <a href="/signup" className="text-[#ea7f61] hover:text-[#d85f3f] font-bold">Sign up</a>
+                      {t('auctionDetail.noAccount')} <a href="/signup" className="text-[#ea7f61] hover:text-[#d85f3f] font-bold">{t('auctionDetail.signUp')}</a>
                     </p>
                   </div>
                 )}
@@ -372,6 +408,7 @@ const AuctionDetailPage = () => {
           </div>
         </div>
       </div>
+
 
       {/* Bid Modal */}
       <BidModal
@@ -383,5 +420,6 @@ const AuctionDetailPage = () => {
     </>
   );
 };
+
 
 export default AuctionDetailPage;

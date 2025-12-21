@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 
+
 const Modal = ({ isOpen, onClose, title, children }) => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -13,6 +17,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     };
   }, [isOpen]);
 
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -20,11 +25,14 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       }
     };
 
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
+
   if (!isOpen) return null;
+
 
   return (
     <>
@@ -45,6 +53,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         }
       `}</style>
 
+
       <div 
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
         style={{ animation: 'fadeIn 0.2s ease-out' }}
@@ -54,6 +63,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           onClick={onClose}
         ></div>
+
 
         {/* Modal */}
         <div 
@@ -67,11 +77,12 @@ const Modal = ({ isOpen, onClose, title, children }) => {
             <button
               onClick={onClose}
               className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F2ED] text-[#6B6B6B] hover:text-[#ea7f61] transition-all"
-              aria-label="Close modal"
+              aria-label={t('common.closeModal')}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
+
 
           {/* Content */}
           <div>
@@ -82,5 +93,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     </>
   );
 };
+
 
 export default Modal;

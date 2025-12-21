@@ -1,17 +1,20 @@
 import { useTranslation } from 'react-i18next';
 import { Search, X, MapPin, Tag } from 'lucide-react';
 
+
 const AuctionFilters = ({ filters, setFilters, onClear }) => {
   const { t } = useTranslation();
 
+
   const categories = [
-    'Vegetables',
-    'Fruits',
-    'Grains',
-    'Pulses',
-    'Spices',
-    'Other',
+    'vegetables',
+    'fruits',
+    'grains',
+    'pulses',
+    'spices',
+    'other',
   ];
+
 
   const states = [
     'Maharashtra',
@@ -23,6 +26,7 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
     'Rajasthan',
     'Other',
   ];
+
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
@@ -37,28 +41,30 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
             className="text-sm text-[#6B6B6B] hover:text-[#ea7f61] font-bold flex items-center gap-2 transition-colors"
           >
             <X className="w-4 h-4" />
-            Clear All
+            {t('marketplace.clearAll')}
           </button>
         )}
       </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Search */}
         <div>
           <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-            {t('marketplace.searchPlaceholder')}
+            {t('common.search')}
           </label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B]" />
             <input
               type="text"
-              placeholder="Search auctions..."
+              placeholder={t('marketplace.searchPlaceholder')}
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               className="w-full h-12 pl-11 pr-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
             />
           </div>
         </div>
+
 
         {/* Category */}
         <div>
@@ -78,15 +84,16 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
                 backgroundSize: '1.25rem'
               }}
             >
-              <option value="">All Categories</option>
+              <option value="">{t('marketplace.allCategories')}</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat}
+                  {t(`categories.${cat}`)}
                 </option>
               ))}
             </select>
           </div>
         </div>
+
 
         {/* State */}
         <div>
@@ -106,7 +113,7 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
                 backgroundSize: '1.25rem'
               }}
             >
-              <option value="">All Locations</option>
+              <option value="">{t('marketplace.allLocations')}</option>
               {states.map((state) => (
                 <option key={state} value={state}>
                   {state}
@@ -116,22 +123,23 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
           </div>
         </div>
 
+
         {/* Price Range */}
         <div>
           <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-            Price Range
+            {t('marketplace.priceRange')}
           </label>
           <div className="flex gap-2">
             <input
               type="number"
-              placeholder="Min ₹"
+              placeholder={t('marketplace.minPricePlaceholder')}
               value={filters.minPrice}
               onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
               className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
             />
             <input
               type="number"
-              placeholder="Max ₹"
+              placeholder={t('marketplace.maxPricePlaceholder')}
               value={filters.maxPrice}
               onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
               className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
@@ -140,14 +148,15 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
         </div>
       </div>
 
+
       {/* Active Filters Display */}
       {(filters.search || filters.category || filters.state || filters.minPrice || filters.maxPrice) && (
         <div className="mt-6 pt-6 border-t border-[#E5DED3]">
-          <p className="text-sm font-bold text-[#2D2D2D] mb-3">Active Filters:</p>
+          <p className="text-sm font-bold text-[#2D2D2D] mb-3">{t('marketplace.activeFilters')}:</p>
           <div className="flex flex-wrap gap-2">
             {filters.search && (
               <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
-                Search: "{filters.search}"
+                {t('marketplace.searchLabel')}: "{filters.search}"
                 <button 
                   onClick={() => setFilters({ ...filters, search: '' })}
                   className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
@@ -158,7 +167,7 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
             )}
             {filters.category && (
               <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
-                Category: {filters.category}
+                {t('marketplace.categoryLabel')}: {t(`categories.${filters.category}`)}
                 <button 
                   onClick={() => setFilters({ ...filters, category: '' })}
                   className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
@@ -169,7 +178,7 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
             )}
             {filters.state && (
               <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
-                Location: {filters.state}
+                {t('marketplace.locationLabel')}: {filters.state}
                 <button 
                   onClick={() => setFilters({ ...filters, state: '' })}
                   className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"
@@ -180,7 +189,7 @@ const AuctionFilters = ({ filters, setFilters, onClear }) => {
             )}
             {(filters.minPrice || filters.maxPrice) && (
               <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#ea7f61]/10 text-[#ea7f61] rounded-lg text-sm font-medium">
-                Price: ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '∞'}
+                {t('marketplace.priceLabel')}: ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '∞'}
                 <button 
                   onClick={() => setFilters({ ...filters, minPrice: '', maxPrice: '' })}
                   className="hover:bg-[#ea7f61]/20 rounded-full p-0.5 transition-colors"

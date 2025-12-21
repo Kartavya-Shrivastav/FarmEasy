@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../app/hooks';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
@@ -22,7 +23,9 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 
+
 const AdminDashboard = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const [pendingAuctions, setPendingAuctions] = useState([]);
@@ -35,6 +38,7 @@ const AdminDashboard = () => {
     auctionEndsAt: '',
   });
 
+
   // Redirect if not admin
   if (user?.role !== 'admin') {
     return (
@@ -43,23 +47,25 @@ const AdminDashboard = () => {
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-10 h-10 text-red-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">Access Denied</h2>
-          <p className="text-[#6B6B6B] mb-6">This page is only accessible to administrators.</p>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">{t('admin.accessDenied')}</h2>
+          <p className="text-[#6B6B6B] mb-6">{t('admin.accessDeniedMessage')}</p>
           <button
             onClick={() => navigate('/marketplace')}
             className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
           >
-            Go to Marketplace
+            {t('admin.goToMarketplace')}
           </button>
         </div>
       </div>
     );
   }
 
+
   useEffect(() => {
     setIsVisible(true);
     fetchPendingAuctions();
   }, []);
+
 
   const fetchPendingAuctions = async () => {
     setLoading(true);
@@ -70,11 +76,12 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching pending auctions:', error);
-      showError('Failed to load pending auctions');
+      showError(t('admin.fetchError'));
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleApproveClick = (auction) => {
     setSelectedAuction(auction);
@@ -87,6 +94,7 @@ const AdminDashboard = () => {
     setModalOpen(true);
   };
 
+
   const handleApprove = async () => {
     try {
       const { data } = await api.post(
@@ -94,41 +102,45 @@ const AdminDashboard = () => {
         approvalDates
       );
       if (data.success) {
-        showSuccess('Auction approved successfully!');
+        showSuccess(t('admin.approveSuccess'));
         setModalOpen(false);
         fetchPendingAuctions();
       }
     } catch (error) {
-      showError(error.response?.data?.message || 'Failed to approve auction');
+      showError(error.response?.data?.message || t('admin.approveError'));
     }
   };
 
+
   const handleReject = async (auctionId) => {
-    if (!window.confirm('Are you sure you want to reject this auction?')) {
+    if (!window.confirm(t('admin.rejectConfirm'))) {
       return;
     }
+
 
     try {
       const { data } = await api.post(`/admin/auctions/${auctionId}/reject`);
       if (data.success) {
-        showSuccess('Auction rejected');
+        showSuccess(t('admin.rejectSuccess'));
         fetchPendingAuctions();
       }
     } catch (error) {
-      showError(error.response?.data?.message || 'Failed to reject auction');
+      showError(error.response?.data?.message || t('admin.rejectError'));
     }
   };
+
 
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[#F5F2ED] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-[#6B6B6B] font-medium">Loading dashboard...</p>
+          <p className="text-[#6B6B6B] font-medium">{t('admin.loadingDashboard')}</p>
         </div>
       </div>
     );
   }
+
 
   return (
     <>
@@ -149,6 +161,7 @@ const AdminDashboard = () => {
         }
       `}</style>
 
+
       <div className="min-h-screen bg-[#F5F2ED]">
         {/* Header */}
         <div className="bg-white border-b border-[#E5DED3]">
@@ -161,12 +174,13 @@ const AdminDashboard = () => {
                 <ShieldCheck className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-[#2D2D2D]">Admin Dashboard</h1>
-                <p className="text-[#6B6B6B]">Manage and approve auction listings</p>
+                <h1 className="text-3xl font-bold text-[#2D2D2D]">{t('admin.dashboard')}</h1>
+                <p className="text-[#6B6B6B]">{t('admin.dashboardSubtitle')}</p>
               </div>
             </div>
           </div>
         </div>
+
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
@@ -181,7 +195,7 @@ const AdminDashboard = () => {
                   <Clock className="w-6 h-6 text-[#ea7f61]" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#6B6B6B]">Pending Approvals</p>
+                  <p className="text-sm text-[#6B6B6B]">{t('admin.pendingApprovals')}</p>
                   <p className="text-3xl font-bold text-[#2D2D2D]">{pendingAuctions.length}</p>
                 </div>
               </div>
@@ -189,10 +203,11 @@ const AdminDashboard = () => {
                 onClick={fetchPendingAuctions}
                 className="text-[#ea7f61] hover:text-[#d85f3f] font-bold text-sm transition-colors"
               >
-                Refresh
+                {t('admin.refresh')}
               </button>
             </div>
           </div>
+
 
           {/* Pending Auctions List */}
           {pendingAuctions.length === 0 ? (
@@ -203,8 +218,8 @@ const AdminDashboard = () => {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
-              <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">All Caught Up!</h3>
-              <p className="text-[#6B6B6B]">No pending auctions to review at the moment.</p>
+              <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">{t('admin.allCaughtUp')}</h3>
+              <p className="text-[#6B6B6B]">{t('admin.noPendingAuctions')}</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -236,9 +251,10 @@ const AdminDashboard = () => {
                           </div>
                         )}
                         <div className="absolute top-3 left-3 bg-[#ea7f61] text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                          {auction.category}
+                          {t(`categories.${auction.category.toLowerCase()}`, auction.category)}
                         </div>
                       </div>
+
 
                       {/* Details */}
                       <div className="flex-1 space-y-4">
@@ -247,6 +263,7 @@ const AdminDashboard = () => {
                           <p className="text-[#6B6B6B] line-clamp-2">{auction.description}</p>
                         </div>
 
+
                         {/* Info Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                           <div className="flex items-center gap-2">
@@ -254,51 +271,55 @@ const AdminDashboard = () => {
                               <User className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
-                              <p className="text-xs text-[#6B6B6B]">Farmer</p>
+                              <p className="text-xs text-[#6B6B6B]">{t('admin.farmer')}</p>
                               <p className="text-sm font-bold text-[#2D2D2D] truncate">{auction.farmer?.name}</p>
                             </div>
                           </div>
+
 
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                               <Package className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
-                              <p className="text-xs text-[#6B6B6B]">Quantity</p>
-                              <p className="text-sm font-bold text-[#2D2D2D]">{auction.quantity} {auction.unit}</p>
+                              <p className="text-xs text-[#6B6B6B]">{t('admin.quantity')}</p>
+                              <p className="text-sm font-bold text-[#2D2D2D]">{auction.quantity} {t(`units.${auction.unit.toLowerCase()}`, auction.unit)}</p>
                             </div>
                           </div>
+
 
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                               <IndianRupee className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
-                              <p className="text-xs text-[#6B6B6B]">Min Price</p>
-                              <p className="text-sm font-bold text-[#2D2D2D]">₹{auction.minPrice}</p>
+                              <p className="text-xs text-[#6B6B6B]">{t('admin.minPrice')}</p>
+                              <p className="text-sm font-bold text-[#2D2D2D]">₹{auction.minPrice.toLocaleString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}</p>
                             </div>
                           </div>
+
 
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                               <MapPin className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
-                              <p className="text-xs text-[#6B6B6B]">Location</p>
+                              <p className="text-xs text-[#6B6B6B]">{t('admin.location')}</p>
                               <p className="text-sm font-bold text-[#2D2D2D] truncate">
                                 {auction.location?.district}, {auction.location?.state}
                               </p>
                             </div>
                           </div>
 
+
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                               <Calendar className="w-4 h-4 text-[#ea7f61]" />
                             </div>
                             <div>
-                              <p className="text-xs text-[#6B6B6B]">Submitted</p>
+                              <p className="text-xs text-[#6B6B6B]">{t('admin.submitted')}</p>
                               <p className="text-sm font-bold text-[#2D2D2D]">
-                                {new Date(auction.createdAt).toLocaleDateString('en-IN', {
+                                {new Date(auction.createdAt).toLocaleDateString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN', {
                                   day: 'numeric',
                                   month: 'short'
                                 })}
@@ -307,6 +328,7 @@ const AdminDashboard = () => {
                           </div>
                         </div>
 
+
                         {/* Actions */}
                         <div className="flex flex-wrap gap-3 pt-4">
                           <button
@@ -314,14 +336,14 @@ const AdminDashboard = () => {
                             className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
                           >
                             <CheckCircle className="w-4 h-4" />
-                            Approve
+                            {t('admin.approveButton')}
                           </button>
                           <button
                             onClick={() => handleReject(auction._id)}
                             className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
                           >
                             <XCircle className="w-4 h-4" />
-                            Reject
+                            {t('admin.rejectButton')}
                           </button>
                         </div>
                       </div>
@@ -334,21 +356,23 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+
       {/* Approval Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Approve Auction"
+        title={t('admin.approveModalTitle')}
       >
         <div className="space-y-5">
           <div className="bg-[#F5F2ED] rounded-xl p-4">
-            <p className="text-sm text-[#6B6B6B] mb-1">Approving auction:</p>
+            <p className="text-sm text-[#6B6B6B] mb-1">{t('admin.approvingAuction')}:</p>
             <p className="font-bold text-[#2D2D2D]">{selectedAuction?.title}</p>
           </div>
 
+
           <div>
             <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-              Auction Starts At
+              {t('admin.auctionStartsAt')}
             </label>
             <input
               type="datetime-local"
@@ -361,9 +385,10 @@ const AdminDashboard = () => {
             />
           </div>
 
+
           <div>
             <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-              Auction Ends At
+              {t('admin.auctionEndsAt')}
             </label>
             <input
               type="datetime-local"
@@ -377,18 +402,19 @@ const AdminDashboard = () => {
             />
           </div>
 
+
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => setModalOpen(false)}
               className="flex-1 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2.5 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleApprove}
               className="flex-1 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg"
             >
-              Approve Auction
+              {t('admin.approveAuctionButton')}
             </button>
           </div>
         </div>
@@ -396,5 +422,6 @@ const AdminDashboard = () => {
     </>
   );
 };
+
 
 export default AdminDashboard;

@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { CheckCircle, XCircle, Mail, ArrowRight } from 'lucide-react';
 
+
 const VerifyEmailPage = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
@@ -13,6 +16,7 @@ const VerifyEmailPage = () => {
   
   // Prevent double execution in React StrictMode
   const hasVerified = useRef(false);
+
 
   useEffect(() => {
     setIsVisible(true);
@@ -23,25 +27,30 @@ const VerifyEmailPage = () => {
     }
   }, []);
 
+
   const verifyEmail = async () => {
     const token = searchParams.get('token');
 
+
     if (!token) {
       setStatus('error');
-      setMessage('No verification token provided');
+      setMessage(t('verifyEmail.noToken'));
       return;
     }
 
+
     try {
       console.log('Verifying token:', token);
+
 
       const { data } = await api.get(`/auth/verify-email?token=${token}`);
       
       console.log('Verification response:', data);
 
+
       if (data.success) {
         setStatus('success');
-        setMessage(data.message || 'Email verified successfully!');
+        setMessage(data.message || t('verifyEmail.successMessage'));
         
         // Redirect to login after 3 seconds
         setTimeout(() => {
@@ -49,7 +58,7 @@ const VerifyEmailPage = () => {
         }, 3000);
       } else {
         setStatus('error');
-        setMessage(data.message || 'Verification failed');
+        setMessage(data.message || t('verifyEmail.errorMessage'));
       }
     } catch (error) {
       console.error('Verification error:', error);
@@ -60,13 +69,14 @@ const VerifyEmailPage = () => {
       
       if (errorMsg.includes('Invalid or expired token')) {
         setStatus('error');
-        setMessage('This verification link has already been used or has expired. If you already verified, please try logging in.');
+        setMessage(t('verifyEmail.tokenExpired'));
       } else {
         setStatus('error');
-        setMessage(errorMsg || 'Verification failed. Please try again.');
+        setMessage(errorMsg || t('verifyEmail.errorMessage'));
       }
     }
   };
+
 
   return (
     <>
@@ -105,6 +115,7 @@ const VerifyEmailPage = () => {
         }
       `}</style>
 
+
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#F5F2ED] px-4 py-12">
         <div 
           className={`max-w-md w-full ${isVisible ? 'opacity-0 translate-y-4' : 'opacity-0'}`}
@@ -117,6 +128,7 @@ const VerifyEmailPage = () => {
             <span className="text-5xl">🌾</span>
             <h2 className="text-2xl font-bold text-[#2D2D2D] mt-2">FarmEasy</h2>
           </div>
+
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#E5DED3]">
             {/* Verifying State */}
@@ -136,10 +148,10 @@ const VerifyEmailPage = () => {
                   <Mail className="w-8 h-8 text-[#ea7f61] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 </div>
                 <h2 className="text-2xl font-bold text-[#2D2D2D] mb-3">
-                  Verifying Your Email
+                  {t('verifyEmail.verifying')}
                 </h2>
                 <p className="text-[#6B6B6B]">
-                  Please wait while we verify your email address...
+                  {t('verifyEmail.verifyingMessage')}
                 </p>
                 <div className="mt-6 flex justify-center gap-1">
                   <div className="w-2 h-2 bg-[#ea7f61] rounded-full animate-bounce" style={{animationDelay: '0s'}}></div>
@@ -148,6 +160,7 @@ const VerifyEmailPage = () => {
                 </div>
               </div>
             )}
+
 
             {/* Success State */}
             {status === 'success' && (
@@ -161,7 +174,7 @@ const VerifyEmailPage = () => {
                   <CheckCircle className="w-12 h-12 text-green-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-green-600 mb-3">
-                  Email Verified!
+                  {t('verifyEmail.success')}
                 </h2>
                 <p className="text-[#6B6B6B] mb-6">{message}</p>
                 
@@ -177,19 +190,21 @@ const VerifyEmailPage = () => {
                     ></div>
                   </div>
                   <p className="text-sm text-[#6B6B6B] mt-2">
-                    Redirecting to login page...
+                    {t('verifyEmail.redirecting')}
                   </p>
                 </div>
+
 
                 <Link 
                   to="/login"
                   className="inline-flex items-center gap-2 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
                 >
-                  Go to Login
+                  {t('verifyEmail.goToLogin')}
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
             )}
+
 
             {/* Error State */}
             {status === 'error' && (
@@ -203,20 +218,20 @@ const VerifyEmailPage = () => {
                   <XCircle className="w-12 h-12 text-red-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-red-600 mb-3">
-                  Verification Failed
+                  {t('verifyEmail.failed')}
                 </h2>
                 <p className="text-[#6B6B6B] mb-8">{message}</p>
                 
                 <div className="space-y-3">
                   <Link to="/login" className="block">
                     <button className="w-full bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                      Try Logging In
+                      {t('verifyEmail.tryLogin')}
                       <ArrowRight className="w-5 h-5" />
                     </button>
                   </Link>
                   <Link to="/signup" className="block">
                     <button className="w-full bg-white hover:bg-[#F5F2ED] text-[#2D2D2D] font-bold py-3 px-6 rounded-xl border-2 border-[#E5DED3] transition-all duration-200">
-                      Back to Signup
+                      {t('verifyEmail.backToSignup')}
                     </button>
                   </Link>
                 </div>
@@ -224,14 +239,16 @@ const VerifyEmailPage = () => {
             )}
           </div>
 
+
           {/* Back to Home */}
           <div className="text-center mt-6">
             <Link to="/" className="text-sm text-[#6B6B6B] hover:text-[#2D2D2D] flex items-center justify-center gap-2">
-              <span>←</span> Back to Home
+              <span>←</span> {t('common.backToHome')}
             </Link>
           </div>
         </div>
       </div>
+
 
       <style>{`
         @keyframes slideRight {
@@ -242,5 +259,6 @@ const VerifyEmailPage = () => {
     </>
   );
 };
+
 
 export default VerifyEmailPage;

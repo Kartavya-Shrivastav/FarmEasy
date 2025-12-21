@@ -20,15 +20,17 @@ import {
   Plus
 } from 'lucide-react';
 
+
 const CreateAuctionPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
 
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'Vegetables',
+    category: 'vegetables',
     quantity: '',
     unit: 'kg',
     state: '',
@@ -40,13 +42,16 @@ const CreateAuctionPage = () => {
     minBidHop: '',
   });
 
+
   const [imageFiles, setImageFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const categories = ['Vegetables', 'Fruits', 'Grains', 'Pulses', 'Spices', 'Other'];
+
+  const categories = ['vegetables', 'fruits', 'grains', 'pulses', 'spices', 'other'];
   const units = ['kg', 'quintal', 'ton', 'piece', 'dozen'];
+
 
   // Redirect if not farmer
   if (user?.role !== 'farmer') {
@@ -56,45 +61,51 @@ const CreateAuctionPage = () => {
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-10 h-10 text-red-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">Access Denied</h2>
-          <p className="text-[#6B6B6B] mb-6">Only farmers can create auctions. Please login with a farmer account.</p>
+          <h2 className="text-2xl font-bold text-[#2D2D2D] mb-2">{t('createAuction.accessDenied')}</h2>
+          <p className="text-[#6B6B6B] mb-6">{t('createAuction.accessDeniedMessage')}</p>
           <button
             onClick={() => navigate('/marketplace')}
             className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
           >
-            Go to Marketplace
+            {t('admin.goToMarketplace')}
           </button>
         </div>
       </div>
     );
   }
 
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   };
 
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + imageFiles.length > 5) {
-      showError('Maximum 5 images allowed');
+      showError(t('createAuction.maxImagesError'));
       return;
     }
     setImageFiles([...imageFiles, ...files]);
   };
 
+
   const removeImage = (index) => {
     setImageFiles(imageFiles.filter((_, i) => i !== index));
   };
 
+
   const uploadImages = async () => {
     if (imageFiles.length === 0) return [];
+
 
     setUploading(true);
     const formDataObj = new FormData();
     imageFiles.forEach((file) => {
       formDataObj.append('images', file);
     });
+
 
     try {
       const { data } = await api.post('/upload', formDataObj, {
@@ -103,20 +114,23 @@ const CreateAuctionPage = () => {
       return data.images;
     } catch (error) {
       console.error('Image upload error:', error);
-      throw new Error('Failed to upload images');
+      throw new Error(t('createAuction.imageUploadError'));
     } finally {
       setUploading(false);
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+
     try {
       // Upload images first
       const uploadedImages = await uploadImages();
+
 
       // Create auction
       const payload = {
@@ -132,24 +146,28 @@ const CreateAuctionPage = () => {
         minBidHop: Number(formData.minBidHop),
       };
 
+
       delete payload.state;
       delete payload.district;
       delete payload.village;
 
+
       const { data } = await api.post('/auctions', payload);
 
+
       if (data.success) {
-        showSuccess('Auction created successfully! Waiting for admin approval.');
+        showSuccess(t('createAuction.successMessage'));
         navigate('/my-auctions');
       }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to create auction';
+      const errorMsg = err.response?.data?.message || t('createAuction.auctionError');
       setError(errorMsg);
       showError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#F5F2ED] py-8">
@@ -161,20 +179,22 @@ const CreateAuctionPage = () => {
               <Plus className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-[#2D2D2D]">Create New Auction</h1>
-              <p className="text-[#6B6B6B]">List your produce for buyers</p>
+              <h1 className="text-3xl font-bold text-[#2D2D2D]">{t('createAuction.title')}</h1>
+              <p className="text-[#6B6B6B]">{t('createAuction.subtitle')}</p>
             </div>
           </div>
         </div>
+
 
         {/* Info Banner */}
         <div className="bg-blue-50 border-l-4 border-blue-500 rounded-xl p-4 mb-6 flex items-start gap-3">
           <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-blue-700 font-medium">Your auction will be reviewed by an admin before going live.</p>
-            <p className="text-xs text-blue-600 mt-1">Please ensure all details are accurate.</p>
+            <p className="text-sm text-blue-700 font-medium">{t('createAuction.reviewInfo')}</p>
+            <p className="text-xs text-blue-600 mt-1">{t('createAuction.accuracyInfo')}</p>
           </div>
         </div>
+
 
         {/* Error Alert */}
         {error && (
@@ -186,6 +206,7 @@ const CreateAuctionPage = () => {
           </div>
         )}
 
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Product Information */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
@@ -193,13 +214,14 @@ const CreateAuctionPage = () => {
               <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
                 <Package className="w-5 h-5 text-[#ea7f61]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2D2D2D]">Product Information</h2>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">{t('createAuction.basicInfo')}</h2>
             </div>
+
 
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Product Title *
+                  {t('createAuction.productTitle')} *
                 </label>
                 <input
                   type="text"
@@ -207,16 +229,17 @@ const CreateAuctionPage = () => {
                   value={formData.title}
                   onChange={handleChange}
                   required
-                  placeholder="e.g., Fresh Organic Tomatoes"
+                  placeholder={t('createAuction.productTitlePlaceholder')}
                   maxLength={120}
                   className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
                 />
-                <p className="text-xs text-[#6B6B6B] mt-1">{formData.title.length}/120 characters</p>
+                <p className="text-xs text-[#6B6B6B] mt-1">{t('createAuction.charactersCount', { count: formData.title.length, max: 120 })}</p>
               </div>
+
 
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Description *
+                  {t('createAuction.description')} *
                 </label>
                 <textarea
                   name="description"
@@ -224,17 +247,18 @@ const CreateAuctionPage = () => {
                   onChange={handleChange}
                   rows={4}
                   required
-                  placeholder="Describe your product quality, variety, growing conditions..."
+                  placeholder={t('createAuction.descriptionPlaceholder')}
                   maxLength={2000}
                   className="w-full px-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B] resize-none"
                 />
-                <p className="text-xs text-[#6B6B6B] mt-1">{formData.description.length}/2000 characters</p>
+                <p className="text-xs text-[#6B6B6B] mt-1">{t('createAuction.charactersCount', { count: formData.description.length, max: 2000 })}</p>
               </div>
+
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                    Category *
+                    {t('createAuction.category')} *
                   </label>
                   <select
                     name="category"
@@ -244,14 +268,15 @@ const CreateAuctionPage = () => {
                     className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] bg-white"
                   >
                     {categories.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
+                      <option key={cat} value={cat}>{t(`categories.${cat}`)}</option>
                     ))}
                   </select>
                 </div>
 
+
                 <div>
                   <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                    Unit *
+                    {t('createAuction.unit')} *
                   </label>
                   <select
                     name="unit"
@@ -261,15 +286,16 @@ const CreateAuctionPage = () => {
                     className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] bg-white"
                   >
                     {units.map((unit) => (
-                      <option key={unit} value={unit}>{unit}</option>
+                      <option key={unit} value={unit}>{t(`units.${unit}`)}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
+
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Quantity *
+                  {t('createAuction.quantity')} *
                 </label>
                 <input
                   type="number"
@@ -285,19 +311,21 @@ const CreateAuctionPage = () => {
             </div>
           </div>
 
+
           {/* Location */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
                 <MapPin className="w-5 h-5 text-[#ea7f61]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2D2D2D]">Location</h2>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">{t('createAuction.locationDetails')}</h2>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  State *
+                  {t('createAuction.state')} *
                 </label>
                 <input
                   type="text"
@@ -305,14 +333,15 @@ const CreateAuctionPage = () => {
                   value={formData.state}
                   onChange={handleChange}
                   required
-                  placeholder="Punjab"
+                  placeholder={t('createAuction.statePlaceholder')}
                   className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
                 />
               </div>
 
+
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  District *
+                  {t('createAuction.district')} *
                 </label>
                 <input
                   type="text"
@@ -320,26 +349,28 @@ const CreateAuctionPage = () => {
                   value={formData.district}
                   onChange={handleChange}
                   required
-                  placeholder="Ludhiana"
+                  placeholder={t('createAuction.districtPlaceholder')}
                   className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
                 />
               </div>
 
+
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Village
+                  {t('createAuction.village')}
                 </label>
                 <input
                   type="text"
                   name="village"
                   value={formData.village}
                   onChange={handleChange}
-                  placeholder="Samrala"
+                  placeholder={t('createAuction.villagePlaceholder')}
                   className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
                 />
               </div>
             </div>
           </div>
+
 
           {/* Dates */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
@@ -347,13 +378,14 @@ const CreateAuctionPage = () => {
               <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-[#ea7f61]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2D2D2D]">Dates</h2>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">{t('createAuction.auctionTiming')}</h2>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Date of Entry *
+                  {t('createAuction.dateOfEntry')} *
                 </label>
                 <input
                   type="date"
@@ -365,9 +397,10 @@ const CreateAuctionPage = () => {
                 />
               </div>
 
+
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Expires At *
+                  {t('createAuction.expiresAt')} *
                 </label>
                 <input
                   type="date"
@@ -382,19 +415,21 @@ const CreateAuctionPage = () => {
             </div>
           </div>
 
+
           {/* Pricing */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
                 <IndianRupee className="w-5 h-5 text-[#ea7f61]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2D2D2D]">Pricing</h2>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">{t('createAuction.quantityAndPricing')}</h2>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Minimum Price (₹) *
+                  {t('createAuction.minPrice')} *
                 </label>
                 <input
                   type="number"
@@ -403,14 +438,15 @@ const CreateAuctionPage = () => {
                   onChange={handleChange}
                   required
                   min="0"
-                  placeholder="1000"
+                  placeholder={t('createAuction.minPricePlaceholder')}
                   className="w-full h-12 px-4 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all text-[#2D2D2D] placeholder:text-[#6B6B6B]"
                 />
               </div>
 
+
               <div>
                 <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                  Minimum Bid Increment (₹) *
+                  {t('createAuction.minBidIncrement')} *
                 </label>
                 <input
                   type="number"
@@ -426,24 +462,26 @@ const CreateAuctionPage = () => {
             </div>
           </div>
 
+
           {/* Images */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-[#E5DED3]">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-[#ea7f61]/10 flex items-center justify-center">
                 <ImageIcon className="w-5 h-5 text-[#ea7f61]" />
               </div>
-              <h2 className="text-xl font-bold text-[#2D2D2D]">Product Images</h2>
+              <h2 className="text-xl font-bold text-[#2D2D2D]">{t('createAuction.uploadImages')}</h2>
             </div>
+
 
             <div className="space-y-4">
               <label className="block">
                 <div className="border-2 border-dashed border-[#E5DED3] rounded-xl p-8 text-center hover:border-[#ea7f61] transition-colors cursor-pointer bg-[#F5F2ED]/30">
                   <Upload className="w-8 h-8 text-[#ea7f61] mx-auto mb-3" />
                   <p className="text-sm font-bold text-[#2D2D2D] mb-1">
-                    Click to upload images
+                    {t('createAuction.clickToUpload')}
                   </p>
                   <p className="text-xs text-[#6B6B6B]">
-                    Max 5 images, up to 5MB each (JPG, PNG)
+                    {t('createAuction.maxImages')}
                   </p>
                   <input
                     type="file"
@@ -455,6 +493,7 @@ const CreateAuctionPage = () => {
                   />
                 </div>
               </label>
+
 
               {imageFiles.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -479,6 +518,7 @@ const CreateAuctionPage = () => {
             </div>
           </div>
 
+
           {/* Submit Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <button
@@ -487,7 +527,7 @@ const CreateAuctionPage = () => {
               disabled={loading || uploading}
               className="flex-1 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-3 px-6 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all disabled:opacity-50"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -497,10 +537,10 @@ const CreateAuctionPage = () => {
               {loading || uploading ? (
                 <>
                   <LoadingSpinner size="sm" />
-                  <span>{uploading ? 'Uploading...' : 'Creating...'}</span>
+                  <span>{uploading ? t('createAuction.uploading') : t('createAuction.creating')}</span>
                 </>
               ) : (
-                'Create Auction'
+                t('createAuction.createAuction')
               )}
             </button>
           </div>
@@ -509,5 +549,6 @@ const CreateAuctionPage = () => {
     </div>
   );
 };
+
 
 export default CreateAuctionPage;

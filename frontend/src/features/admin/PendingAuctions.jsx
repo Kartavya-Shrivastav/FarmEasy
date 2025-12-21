@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Modal from '../../components/common/Modal';
@@ -15,13 +16,16 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+
 const PendingAuctions = ({ auctions, onUpdate }) => {
+  const { t, i18n } = useTranslation();
   const [selectedAuction, setSelectedAuction] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [approvalDates, setApprovalDates] = useState({
     auctionStartsAt: new Date().toISOString().slice(0, 16),
     auctionEndsAt: '',
   });
+
 
   const handleApproveClick = (auction) => {
     setSelectedAuction(auction);
@@ -34,6 +38,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
     setModalOpen(true);
   };
 
+
   const handleApprove = async () => {
     try {
       const { data } = await api.post(
@@ -41,30 +46,33 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
         approvalDates
       );
       if (data.success) {
-        showSuccess('Auction approved successfully!');
+        showSuccess(t('admin.approveSuccess'));
         setModalOpen(false);
         onUpdate();
       }
     } catch (error) {
-      showError(error.response?.data?.message || 'Failed to approve auction');
+      showError(error.response?.data?.message || t('admin.approveError'));
     }
   };
 
+
   const handleReject = async (auctionId) => {
-    if (!window.confirm('Are you sure you want to reject this auction?')) {
+    if (!window.confirm(t('admin.rejectConfirm'))) {
       return;
     }
+
 
     try {
       const { data } = await api.post(`/admin/auctions/${auctionId}/reject`);
       if (data.success) {
-        showSuccess('Auction rejected');
+        showSuccess(t('admin.rejectSuccess'));
         onUpdate();
       }
     } catch (error) {
-      showError(error.response?.data?.message || 'Failed to reject auction');
+      showError(error.response?.data?.message || t('admin.rejectError'));
     }
   };
+
 
   if (auctions.length === 0) {
     return (
@@ -72,12 +80,13 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle className="w-10 h-10 text-green-500" />
         </div>
-        <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">All Caught Up!</h3>
-        <p className="text-[#6B6B6B]">No pending auctions to review</p>
-        <p className="text-sm text-[#6B6B6B] mt-1">All auctions have been reviewed</p>
+        <h3 className="text-xl font-bold text-[#2D2D2D] mb-2">{t('admin.allCaughtUp')}</h3>
+        <p className="text-[#6B6B6B]">{t('admin.noPendingAuctions')}</p>
+        <p className="text-sm text-[#6B6B6B] mt-1">{t('admin.allAuctionsReviewed')}</p>
       </div>
     );
   }
+
 
   return (
     <>
@@ -91,10 +100,11 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
             <div className="bg-gradient-to-r from-amber-400 to-amber-500 px-4 py-2 flex items-center justify-between">
               <div className="flex items-center gap-2 text-white">
                 <AlertCircle className="w-4 h-4" />
-                <span className="text-sm font-bold">PENDING APPROVAL</span>
+                <span className="text-sm font-bold">{t('admin.pendingApprovalBadge')}</span>
               </div>
-              <span className="text-xs text-white/90">Awaiting Review</span>
+              <span className="text-xs text-white/90">{t('admin.awaitingReview')}</span>
             </div>
+
 
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
@@ -119,6 +129,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
                   )}
                 </div>
 
+
                 {/* Details */}
                 <div className="flex-1 space-y-4">
                   {/* Title */}
@@ -129,6 +140,7 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
                     </p>
                   </div>
 
+
                   {/* Info Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div className="flex items-center gap-2">
@@ -136,45 +148,53 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
                         <User className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
-                        <p className="text-xs text-[#6B6B6B]">Farmer</p>
+                        <p className="text-xs text-[#6B6B6B]">{t('admin.farmer')}</p>
                         <p className="text-sm font-bold text-[#2D2D2D] truncate">
                           {auction.farmer?.name}
                         </p>
                       </div>
                     </div>
 
+
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                         <Tag className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
-                        <p className="text-xs text-[#6B6B6B]">Category</p>
-                        <p className="text-sm font-bold text-[#2D2D2D]">{auction.category}</p>
+                        <p className="text-xs text-[#6B6B6B]">{t('admin.category')}</p>
+                        <p className="text-sm font-bold text-[#2D2D2D]">
+                          {t(`categories.${auction.category.toLowerCase()}`, auction.category)}
+                        </p>
                       </div>
                     </div>
+
 
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                         <Package className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
-                        <p className="text-xs text-[#6B6B6B]">Quantity</p>
+                        <p className="text-xs text-[#6B6B6B]">{t('admin.quantity')}</p>
                         <p className="text-sm font-bold text-[#2D2D2D]">
-                          {auction.quantity} {auction.unit}
+                          {auction.quantity} {t(`units.${auction.unit.toLowerCase()}`, auction.unit)}
                         </p>
                       </div>
                     </div>
+
 
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-[#ea7f61]/10 flex items-center justify-center flex-shrink-0">
                         <IndianRupee className="w-4 h-4 text-[#ea7f61]" />
                       </div>
                       <div>
-                        <p className="text-xs text-[#6B6B6B]">Min Price</p>
-                        <p className="text-sm font-bold text-[#2D2D2D]">₹{auction.minPrice}</p>
+                        <p className="text-xs text-[#6B6B6B]">{t('admin.minPrice')}</p>
+                        <p className="text-sm font-bold text-[#2D2D2D]">
+                          ₹{auction.minPrice.toLocaleString(i18n.language === 'hi' ? 'hi-IN' : 'en-IN')}
+                        </p>
                       </div>
                     </div>
                   </div>
+
 
                   {/* Actions */}
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -183,14 +203,14 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
                       className="flex-1 inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
                     >
                       <CheckCircle className="w-4 h-4" />
-                      Approve
+                      {t('admin.approveButton')}
                     </button>
                     <button
                       onClick={() => handleReject(auction._id)}
                       className="flex-1 inline-flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg"
                     >
                       <XCircle className="w-4 h-4" />
-                      Reject
+                      {t('admin.rejectButton')}
                     </button>
                   </div>
                 </div>
@@ -200,21 +220,23 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
         ))}
       </div>
 
+
       {/* Approval Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Approve Auction"
+        title={t('admin.approveModalTitle')}
       >
         <div className="space-y-5">
           <div className="bg-[#F5F2ED] rounded-xl p-4">
-            <p className="text-sm text-[#6B6B6B] mb-1">Approving auction:</p>
+            <p className="text-sm text-[#6B6B6B] mb-1">{t('admin.approvingAuction')}:</p>
             <p className="font-bold text-[#2D2D2D]">{selectedAuction?.title}</p>
           </div>
 
+
           <div>
             <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-              Auction Starts At
+              {t('admin.auctionStartsAt')}
             </label>
             <input
               type="datetime-local"
@@ -227,9 +249,10 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
             />
           </div>
 
+
           <div>
             <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-              Auction Ends At
+              {t('admin.auctionEndsAt')}
             </label>
             <input
               type="datetime-local"
@@ -243,18 +266,19 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
             />
           </div>
 
+
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => setModalOpen(false)}
               className="flex-1 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2.5 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleApprove}
               className="flex-1 bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-md hover:shadow-lg"
             >
-              Approve Auction
+              {t('admin.approveAuctionButton')}
             </button>
           </div>
         </div>
@@ -262,5 +286,6 @@ const PendingAuctions = ({ auctions, onUpdate }) => {
     </>
   );
 };
+
 
 export default PendingAuctions;

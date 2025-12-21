@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { setUser } from './features/auth/authSlice';
 import Layout from './components/layout/Layout';
@@ -28,8 +29,10 @@ import {
 } from 'lucide-react';
 import FarmerProfile from './features/profile/FarmerProfile';
 
+
 // REDESIGNED HOMEPAGE COMPONENT
 const HomePage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   
@@ -45,12 +48,14 @@ const HomePage = () => {
   const [stepsVisible, setStepsVisible] = useState(false);
   const [ctaVisible, setCtaVisible] = useState(false);
 
+
   // Intersection Observer setup
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px'
     };
+
 
     const observerCallback = (entries) => {
       entries.forEach(entry => {
@@ -63,67 +68,74 @@ const HomePage = () => {
       });
     };
 
+
     const observer = new IntersectionObserver(observerCallback, observerOptions);
+
 
     if (statsRef.current) observer.observe(statsRef.current);
     if (featuresRef.current) observer.observe(featuresRef.current);
     if (stepsRef.current) observer.observe(stepsRef.current);
     if (ctaRef.current) observer.observe(ctaRef.current);
 
+
     return () => observer.disconnect();
   }, []);
+
 
   const features = [
     {
       icon: TrendingUp,
-      title: "Better Prices",
-      description: "Farmers get fair market value through competitive bidding from multiple buyers.",
+      title: t('home.features.betterPrices.title'),
+      description: t('home.features.betterPrices.description'),
     },
     {
       icon: Shield,
-      title: "Verified Quality",
-      description: "Admin-approved listings ensure authenticity and quality of all products.",
+      title: t('home.features.verifiedQuality.title'),
+      description: t('home.features.verifiedQuality.description'),
     },
     {
       icon: Users,
-      title: "Direct Connection",
-      description: "Eliminating middlemen to connect farmers directly with buyers.",
+      title: t('home.features.directConnection.title'),
+      description: t('home.features.directConnection.description'),
     },
   ];
+
 
   const steps = [
     {
       number: "01",
-      title: "List Your Produce",
-      description: "Farmers upload product details, photos, and set minimum prices.",
+      title: t('home.steps.listProduce.title'),
+      description: t('home.steps.listProduce.description'),
       icon: BadgeCheck,
     },
     {
       number: "02",
-      title: "Admin Approval",
-      description: "Our team verifies listings and sets auction duration based on freshness.",
+      title: t('home.steps.adminApproval.title'),
+      description: t('home.steps.adminApproval.description'),
       icon: CheckCircle2,
     },
     {
       number: "03",
-      title: "Buyers Bid",
-      description: "Registered buyers compete with bids, driving fair market prices.",
+      title: t('home.steps.buyersBid.title'),
+      description: t('home.steps.buyersBid.description'),
       icon: Gavel,
     },
     {
       number: "04",
-      title: "Seal the Deal",
-      description: "Farmers lock in when satisfied, buyer gets connected for delivery.",
+      title: t('home.steps.sealDeal.title'),
+      description: t('home.steps.sealDeal.description'),
       icon: Truck,
     },
   ];
 
+
   const stats = [
-    { value: "5,000+", label: "Active Farmers" },
-    { value: "₹2.5Cr+", label: "Total Trade Value" },
-    { value: "15,000+", label: "Successful Deals" },
-    { value: "4.8", label: "Average Rating", icon: Star },
+    { value: "5,000+", label: t('home.stats.activeFarmers') },
+    { value: "₹2.5Cr+", label: t('home.stats.tradeValue') },
+    { value: "15,000+", label: t('home.stats.successfulDeals') },
+    { value: "4.8", label: t('home.stats.averageRating'), icon: Star },
   ];
+
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
@@ -136,6 +148,7 @@ const HomePage = () => {
       navigate('/signup');
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#F5F2ED]">
@@ -166,8 +179,10 @@ const HomePage = () => {
         }
       `}</style>
 
+
       {/* Hero Section */}
       <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
+
 
         {/* Background Image */}
         <div 
@@ -178,9 +193,10 @@ const HomePage = () => {
         >
           <img
             src="src/assets/kissan2.png"
-            alt="Indian farmer with fresh vegetables"
+            alt={t('home.hero.imageAlt')}
             className="w-full h-full object-cover scale-105 filter blur-[3px]"
           />
+
 
           {/* Gradient Overlay */}
           <div
@@ -189,10 +205,12 @@ const HomePage = () => {
           />
         </div>
 
+
         {/* Content */}
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl">
             <div className="space-y-8">
+
 
               {/* Badge */}
               <div
@@ -205,8 +223,9 @@ const HomePage = () => {
                 }}
               >
                 <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                Empowering Indian Agriculture
+                {t('home.hero.badge')}
               </div>
+
 
               {/* Heading */}
               <h1
@@ -218,11 +237,12 @@ const HomePage = () => {
                   animation: 'slideUp 0.6s ease-out 0.4s forwards'
                 }}
               >
-                Sell Your Harvest at the{" "}
+                {t('home.hero.title')}{" "}
                 <span className="text-[#F4A261]">
-                  Best Prices
+                  {t('home.hero.titleHighlight')}
                 </span>
               </h1>
+
 
               {/* Description */}
               <p
@@ -234,9 +254,9 @@ const HomePage = () => {
                   animation: 'slideUp 0.6s ease-out 0.6s forwards'
                 }}
               >
-                FarmEasy connects farmers directly with buyers through a transparent
-                bidding system. No middlemen, fair prices, verified quality.
+                {t('home.hero.description')}
               </p>
+
 
               {/* Buttons */}
               <div 
@@ -253,9 +273,10 @@ const HomePage = () => {
                     rounded-xl transition-all duration-200 
                     shadow-xl hover:scale-[1.03] active:scale-[0.98]"
                 >
-                  Start Selling
+                  {t('home.hero.startSelling')}
                   <ArrowRight className="w-5 h-5" />
                 </button>
+
 
                 <button
                   onClick={() => navigate('/marketplace')}
@@ -266,9 +287,10 @@ const HomePage = () => {
                     transition-all duration-200 shadow-lg 
                     backdrop-blur-sm"
                 >
-                  Browse Market
+                  {t('home.hero.browseMarket')}
                 </button>
               </div>
+
 
               {/* Social Proof */}
               <div 
@@ -292,23 +314,26 @@ const HomePage = () => {
                   ))}
                 </div>
 
+
                 <div
                   className="text-sm bg-white/75 backdrop-blur-sm 
                   px-4 py-2 rounded-lg shadow-md"
                 >
                   <p className="font-semibold text-[#2D2D2D]">
-                    Join 5,000+ farmers
+                    {t('home.hero.joinFarmers')}
                   </p>
                   <p className="text-[#5F5F5F]">
-                    who trust FarmEasy
+                    {t('home.hero.trustFarmEasy')}
                   </p>
                 </div>
               </div>
+
 
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Stats Section */}
       <section ref={statsRef} className="py-12 bg-white border-y border-[#E5DED3]">
@@ -335,6 +360,7 @@ const HomePage = () => {
         </div>
       </section>
 
+
       {/* Features Section */}
       <section ref={featuresRef} className="py-20 md:py-28 bg-[#F5F2ED]">
         <div className="container mx-auto px-4">
@@ -345,12 +371,13 @@ const HomePage = () => {
             } : {}}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-4">
-              Why Choose FarmEasy?
+              {t('home.features.title')}
             </h2>
             <p className="text-[#6B6B6B] text-lg">
-              We're revolutionizing how agricultural trade works in India
+              {t('home.features.subtitle')}
             </p>
           </div>
+
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
@@ -374,6 +401,7 @@ const HomePage = () => {
         </div>
       </section>
 
+
       {/* How It Works Section */}
       <section ref={stepsRef} className="py-20 md:py-28 bg-white">
         <div className="container mx-auto px-4">
@@ -384,12 +412,13 @@ const HomePage = () => {
             } : {}}
           >
             <h2 className="text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-4">
-              How It Works
+              {t('home.howItWorks.title')}
             </h2>
             <p className="text-[#6B6B6B] text-lg">
-              From farm to table in four simple steps
+              {t('home.howItWorks.subtitle')}
             </p>
           </div>
+
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
@@ -424,6 +453,7 @@ const HomePage = () => {
       </section>
 
 
+
       {/* CTA Section */}
       <section ref={ctaRef} className="py-20 md:py-28 bg-[#F5F2ED]">
         <div className="container mx-auto px-4">
@@ -440,23 +470,23 @@ const HomePage = () => {
             
             <div className="relative z-10 py-16 md:py-20 px-8 text-center">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-                Ready to Transform Your Farm Business?
+                {t('home.cta.title')}
               </h2>
               <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-                Join thousands of farmers who are already getting better prices for their produce.
+                {t('home.cta.description')}
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <button
                   onClick={() => navigate(isAuthenticated ? (user?.role === 'farmer' ? '/create-auction' : '/marketplace') : '/signup')}
                   className="bg-white hover:bg-gray-100 text-[#E8704F] font-semibold px-8 py-4 rounded-xl transition-all duration-200"
                 >
-                  {isAuthenticated ? (user?.role === 'farmer' ? 'Create Listing' : 'Browse Market') : 'Register as Farmer'}
+                  {isAuthenticated ? (user?.role === 'farmer' ? t('home.cta.createListing') : t('home.cta.browseMarket')) : t('home.cta.registerFarmer')}
                 </button>
                 <button 
                   onClick={() => navigate(isAuthenticated ? '/marketplace' : '/signup')}
                   className="bg-[#2D2D2D] hover:bg-[#1D1D1D] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200"
                 >
-                  {isAuthenticated ? 'View Marketplace' : 'Register as Buyer'}
+                  {isAuthenticated ? t('home.cta.viewMarketplace') : t('home.cta.registerBuyer')}
                 </button>
               </div>
             </div>
@@ -469,10 +499,12 @@ const HomePage = () => {
 
 
 
+
 // APP COMPONENT - KEEP ALL THIS ROUTING LOGIC INTACT
 function App() {
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -494,6 +526,7 @@ function App() {
     };
     checkAuth();
   }, [dispatch]);
+
 
   return (
     <Router>
@@ -517,5 +550,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;

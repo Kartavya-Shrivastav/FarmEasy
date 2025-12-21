@@ -8,6 +8,7 @@ import api from '../../services/api';
 import { showSuccess, showError } from '../../utils/toast';
 import { Mail, Lock, User, Phone, ArrowRight, UserCheck, ShoppingCart } from 'lucide-react';
 
+
 const SignupPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -23,36 +24,42 @@ const SignupPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+
     try {
       const { data } = await api.post('/auth/signup', formData);
       
       if (data.success) {
-        showSuccess('Signup successful! Please check your email to verify your account.');
+        showSuccess(t('auth.signupSuccessMessage'));
         navigate('/login');
       }
 
+
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Signup failed';
+      const errorMsg = err.response?.data?.message || t('auth.signupError');
       setError(errorMsg);
       showError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <>
@@ -83,6 +90,7 @@ const SignupPage = () => {
         }
       `}</style>
 
+
       <div className="min-h-[calc(100vh-4rem)] flex bg-[#F5F2ED]">
         {/* Left Side - Image/Info */}
         <div 
@@ -102,45 +110,49 @@ const SignupPage = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70"></div>
           </div>
 
+
           {/* Decorative Elements */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/3 translate-y-1/3" />
           </div>
 
+
           <div className="relative z-10 text-white max-w-md">
             <div className="mb-8">
               <span className="text-6xl mb-6 block drop-shadow-lg">🌾</span>
               <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
-                Join FarmEasy Today
+                {t('auth.joinTitle')}
               </h1>
               <p className="text-lg text-white/95 drop-shadow-md">
-                Start your journey towards transparent agricultural trading and better prices.
+                {t('auth.joinSubtitle')}
               </p>
             </div>
+
 
             <div className="space-y-4 mt-8">
               <div className="flex items-center gap-3 backdrop-blur-sm bg-white/10 rounded-lg p-3">
                 <div className="w-10 h-10 rounded-full bg-[#ea7f61] flex items-center justify-center shrink-0">
                   <span className="text-2xl">🚜</span>
                 </div>
-                <p className="text-white drop-shadow-md">List your produce in minutes</p>
+                <p className="text-white drop-shadow-md">{t('auth.featureListProduce')}</p>
               </div>
               <div className="flex items-center gap-3 backdrop-blur-sm bg-white/10 rounded-lg p-3">
                 <div className="w-10 h-10 rounded-full bg-[#ea7f61] flex items-center justify-center shrink-0">
                   <span className="text-2xl">💰</span>
                 </div>
-                <p className="text-white drop-shadow-md">Get competitive bids instantly</p>
+                <p className="text-white drop-shadow-md">{t('auth.featureGetBids')}</p>
               </div>
               <div className="flex items-center gap-3 backdrop-blur-sm bg-white/10 rounded-lg p-3">
                 <div className="w-10 h-10 rounded-full bg-[#ea7f61] flex items-center justify-center shrink-0">
                   <span className="text-2xl">🤝</span>
                 </div>
-                <p className="text-white drop-shadow-md">Connect with verified users</p>
+                <p className="text-white drop-shadow-md">{t('auth.featureConnectVerified')}</p>
               </div>
             </div>
           </div>
         </div>
+
 
         {/* Right Side - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
@@ -156,15 +168,17 @@ const SignupPage = () => {
               <h2 className="text-2xl font-bold text-[#2D2D2D] mt-2">FarmEasy</h2>
             </div>
 
+
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#E5DED3]">
               <div className="mb-8">
                 <h2 className="text-3xl font-bold text-[#2D2D2D] mb-2">
                   {t('auth.signupTitle')}
                 </h2>
                 <p className="text-[#6B6B6B]">
-                  Create your account to get started
+                  {t('auth.signupSubtitle')}
                 </p>
               </div>
+
 
               {error && (
                 <div 
@@ -173,10 +187,11 @@ const SignupPage = () => {
                     animation: 'slideInRight 0.3s ease-out'
                   }}
                 >
-                  <p className="font-medium">Error</p>
+                  <p className="font-medium">{t('common.error')}</p>
                   <p className="text-sm">{error}</p>
                 </div>
               )}
+
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Name Input */}
@@ -192,11 +207,12 @@ const SignupPage = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      placeholder="Kissan Singh"
+                      placeholder={t('auth.namePlaceholder')}
                       className="w-full pl-11 pr-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
+
 
                 {/* Email Input */}
                 <div>
@@ -211,11 +227,12 @@ const SignupPage = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      placeholder="kissan@example.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       className="w-full pl-11 pr-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
+
 
                 {/* Password Input */}
                 <div>
@@ -231,11 +248,12 @@ const SignupPage = () => {
                       onChange={handleChange}
                       required
                       minLength={6}
-                      placeholder="At least 6 characters"
+                      placeholder={t('auth.passwordPlaceholderSignup')}
                       className="w-full pl-11 pr-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
+
 
                 {/* Phone Input */}
                 <div>
@@ -249,11 +267,12 @@ const SignupPage = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="9876543210"
+                      placeholder={t('auth.phonePlaceholder')}
                       className="w-full pl-11 pr-4 py-3 border border-[#E5DED3] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
+
 
                 {/* Role Selection */}
                 <div>
@@ -282,8 +301,9 @@ const SignupPage = () => {
                       }`}>
                         {t('auth.farmer')}
                       </span>
-                      <span className="text-xs text-[#6B6B6B] mt-1">Sell produce</span>
+                      <span className="text-xs text-[#6B6B6B] mt-1">{t('auth.sellProduce')}</span>
                     </label>
+
 
                     <label className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
                       formData.role === 'buyer' 
@@ -306,10 +326,11 @@ const SignupPage = () => {
                       }`}>
                         {t('auth.buyer')}
                       </span>
-                      <span className="text-xs text-[#6B6B6B] mt-1">Buy produce</span>
+                      <span className="text-xs text-[#6B6B6B] mt-1">{t('auth.buyProduce')}</span>
                     </label>
                   </div>
                 </div>
+
 
                 {/* Submit Button */}
                 <button
@@ -328,29 +349,32 @@ const SignupPage = () => {
                 </button>
               </form>
 
+
               {/* Divider */}
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-[#E5DED3]"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-[#6B6B6B]">or</span>
+                  <span className="px-4 bg-white text-[#6B6B6B]">{t('common.or')}</span>
                 </div>
               </div>
+
 
               {/* Login Link */}
               <p className="text-center text-[#6B6B6B]">
                 {t('auth.haveAccount')}{' '}
                 <Link to="/login" className="text-[#ea7f61] hover:text-[#d85f3f] font-bold">
-                  {t('auth.loginButton')}
+                  {t('auth.loginLink')}
                 </Link>
               </p>
             </div>
 
+
             {/* Back to Home */}
             <div className="text-center mt-6">
               <Link to="/" className="text-sm text-[#6B6B6B] hover:text-[#2D2D2D] flex items-center justify-center gap-2">
-                <span>←</span> Back to Home
+                <span>←</span> {t('common.backToHome')}
               </Link>
             </div>
           </div>
@@ -359,5 +383,6 @@ const SignupPage = () => {
     </>
   );
 };
+
 
 export default SignupPage;

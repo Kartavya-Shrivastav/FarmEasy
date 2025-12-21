@@ -7,6 +7,7 @@ import LanguageSwitcher from '../common/LanguageSwitcher';
 import api from '../../services/api';
 
 
+
 const Navbar = () => {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -16,9 +17,11 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(false);
 
 
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
 
 
   const handleLogout = async () => {
@@ -34,9 +37,11 @@ const Navbar = () => {
   };
 
 
+
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
+
 
 
   return (
@@ -75,6 +80,7 @@ const Navbar = () => {
       `}</style>
 
 
+
       <nav 
         className={`bg-gradient-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
         style={isVisible ? {
@@ -95,6 +101,7 @@ const Navbar = () => {
               <span className="text-2xl">🌾</span>
               <span className="text-xl font-bold text-[#ea7f61]">FarmEasy</span>
             </Link>
+
 
 
             {/* Desktop Nav Links */}
@@ -132,7 +139,7 @@ const Navbar = () => {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
                     >
-                      My Auctions
+                      {t('nav.myAuctions')}
                     </Link>
                   )}
                   
@@ -150,6 +157,7 @@ const Navbar = () => {
                 </>
               )}
             </div>
+
 
 
             {/* Desktop Right Side */}
@@ -208,6 +216,7 @@ const Navbar = () => {
             </div>
 
 
+
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -215,6 +224,7 @@ const Navbar = () => {
               style={isVisible ? {
                 animation: 'fadeIn 0.6s ease-out 0.3s forwards'
               } : {}}
+              aria-label={t('nav.toggleMenu')}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? (
@@ -225,6 +235,7 @@ const Navbar = () => {
               </svg>
             </button>
           </div>
+
 
 
           {/* Mobile Menu */}
@@ -263,7 +274,7 @@ const Navbar = () => {
                         onClick={closeMobileMenu}
                         className="text-[#1a1a1a] hover:text-[#ea7f61] font-bold py-2 px-4 hover:bg-white rounded-xl transition-colors"
                       >
-                        My Auctions
+                        {t('nav.myAuctions')}
                       </Link>
                     )}
                     
@@ -280,14 +291,16 @@ const Navbar = () => {
                 )}
 
 
+
                 <div className="border-t border-[#ea7f61]/30 pt-3 px-4">
                   <LanguageSwitcher />
                 </div>
 
 
+
                 {isAuthenticated ? (
                   <div className="border-t border-[#ea7f61]/30 pt-3 px-4 space-y-2">
-                    <p className="text-sm text-[#3a3a3a] font-bold">Logged in as: {user?.name}</p>
+                    <p className="text-sm text-[#3a3a3a] font-bold">{t('nav.loggedInAs', { name: user?.name })}</p>
                     <button
                       onClick={handleLogout}
                       className="w-full bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61]"
@@ -321,6 +334,7 @@ const Navbar = () => {
     </>
   );
 };
+
 
 
 export default Navbar;

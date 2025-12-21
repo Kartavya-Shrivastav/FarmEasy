@@ -8,6 +8,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { Search, Package, TrendingUp } from 'lucide-react';
 
+
 const MarketplacePage = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -15,6 +16,7 @@ const MarketplacePage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const auctionsRef = useRef(null);
   const [auctionsVisible, setAuctionsVisible] = useState(false);
+
 
   const [filters, setFilters] = useState({
     search: '',
@@ -24,10 +26,12 @@ const MarketplacePage = () => {
     maxPrice: '',
   });
 
+
   useEffect(() => {
     setIsVisible(true);
     fetchAuctions();
   }, [filters]);
+
 
   // Intersection Observer for auction cards
   useEffect(() => {
@@ -35,6 +39,7 @@ const MarketplacePage = () => {
       threshold: 0.1,
       rootMargin: '0px 0px -100px 0px'
     };
+
 
     const observerCallback = (entries) => {
       entries.forEach(entry => {
@@ -44,14 +49,18 @@ const MarketplacePage = () => {
       });
     };
 
+
     const observer = new IntersectionObserver(observerCallback, observerOptions);
+
 
     if (auctionsRef.current) {
       observer.observe(auctionsRef.current);
     }
 
+
     return () => observer.disconnect();
   }, [auctions]);
+
 
   const fetchAuctions = async () => {
     dispatch(setLoading(true));
@@ -62,6 +71,7 @@ const MarketplacePage = () => {
       if (filters.state) params.append('state', filters.state);
       if (filters.minPrice) params.append('minPrice', filters.minPrice);
       if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+
 
       const { data } = await api.get(`/auctions?${params.toString()}`);
       if (data.success) {
@@ -74,6 +84,7 @@ const MarketplacePage = () => {
     }
   };
 
+
   const handleClearFilters = () => {
     setFilters({
       search: '',
@@ -83,6 +94,7 @@ const MarketplacePage = () => {
       maxPrice: '',
     });
   };
+
 
   return (
     <>
@@ -113,6 +125,7 @@ const MarketplacePage = () => {
         }
       `}</style>
 
+
       <div className="min-h-screen bg-[#F5F2ED]">
         {/* Header Section */}
         <div className="bg-white border-b border-[#E5DED3]">
@@ -125,17 +138,18 @@ const MarketplacePage = () => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#ea7f61]/10 rounded-full text-[#ea7f61] text-sm font-bold mb-4">
                 <Package className="w-4 h-4" />
-                Fresh from Farms
+                {t('marketplace.freshFromFarms')}
               </div>
               <h1 className="text-4xl md:text-5xl font-bold text-[#2D2D2D] mb-4">
                 {t('marketplace.title')}
               </h1>
               <p className="text-lg text-[#6B6B6B]">
-                Browse quality produce from verified farmers across India
+                {t('marketplace.subtitle')}
               </p>
             </div>
           </div>
         </div>
+
 
         {/* Stats Bar */}
         <div 
@@ -152,7 +166,7 @@ const MarketplacePage = () => {
                 </div>
                 <div className="text-left">
                   <p className="text-2xl font-bold text-[#2D2D2D]">{auctions.length}</p>
-                  <p className="text-sm text-[#6B6B6B]">Active Auctions</p>
+                  <p className="text-sm text-[#6B6B6B]">{t('marketplace.activeAuctions')}</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3">
@@ -160,8 +174,8 @@ const MarketplacePage = () => {
                   <TrendingUp className="w-6 h-6 text-[#ea7f61]" />
                 </div>
                 <div className="text-left">
-                  <p className="text-2xl font-bold text-[#2D2D2D]">Live</p>
-                  <p className="text-sm text-[#6B6B6B]">Real-time Bidding</p>
+                  <p className="text-2xl font-bold text-[#2D2D2D]">{t('marketplace.live')}</p>
+                  <p className="text-sm text-[#6B6B6B]">{t('marketplace.realTimeBidding')}</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-3">
@@ -169,13 +183,14 @@ const MarketplacePage = () => {
                   <Search className="w-6 h-6 text-[#ea7f61]" />
                 </div>
                 <div className="text-left">
-                  <p className="text-2xl font-bold text-[#2D2D2D]">Filter</p>
-                  <p className="text-sm text-[#6B6B6B]">Find What You Need</p>
+                  <p className="text-2xl font-bold text-[#2D2D2D]">{t('marketplace.filter')}</p>
+                  <p className="text-sm text-[#6B6B6B]">{t('marketplace.findWhatYouNeed')}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
@@ -193,11 +208,12 @@ const MarketplacePage = () => {
             />
           </div>
 
+
           {/* Loading State */}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-16 h-16 border-4 border-[#E5DED3] border-t-[#ea7f61] rounded-full animate-spin mb-4"></div>
-              <p className="text-[#6B6B6B] font-medium">Loading fresh auctions...</p>
+              <p className="text-[#6B6B6B] font-medium">{t('marketplace.loadingAuctions')}</p>
             </div>
           ) : auctions.length === 0 ? (
             /* Empty State */
@@ -214,14 +230,14 @@ const MarketplacePage = () => {
                 {t('marketplace.noAuctions')}
               </h3>
               <p className="text-[#6B6B6B] mb-6 max-w-md mx-auto">
-                No auctions match your current filters. Try adjusting your search criteria or clear filters to see all available auctions.
+                {t('marketplace.noAuctionsMessage')}
               </p>
               {(filters.search || filters.category || filters.state || filters.minPrice || filters.maxPrice) && (
                 <button
                   onClick={handleClearFilters}
                   className="bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
                 >
-                  Clear All Filters
+                  {t('marketplace.clearAllFilters')}
                 </button>
               )}
             </div>
@@ -248,5 +264,6 @@ const MarketplacePage = () => {
     </>
   );
 };
+
 
 export default MarketplacePage;

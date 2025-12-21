@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Modal from '../common/Modal';
 import Button from '../common/Button';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -6,11 +7,14 @@ import { showSuccess, showError } from '../../utils/toast';
 import api from '../../services/api';
 import { Star, X } from 'lucide-react';
 
+
 const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
+
 
   useEffect(() => {
     if (!isOpen) {
@@ -20,11 +24,14 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
     }
   }, [isOpen]);
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!rating) return;
 
+
     setLoading(true);
+
 
     try {
       const { data } = await api.post(`/auctions/${auction._id}/review`, {
@@ -32,36 +39,40 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
         comment,
       });
 
+
       if (data.success) {
-        showSuccess('Review submitted successfully!');
+        showSuccess(t('review.submitSuccess'));
         onSuccess();
         onClose();
       }
     } catch (error) {
-      showError(error.response?.data?.message || 'Failed to submit review');
+      showError(error.response?.data?.message || t('review.submitError'));
     } finally {
       setLoading(false);
     }
   };
 
+
   const getRatingLabel = (value) => {
     switch (value) {
       case 5:
-        return 'Excellent! 🌟';
+        return t('review.ratingLabels.excellent');
       case 4:
-        return 'Very good';
+        return t('review.ratingLabels.veryGood');
       case 3:
-        return 'Good';
+        return t('review.ratingLabels.good');
       case 2:
-        return 'Fair';
+        return t('review.ratingLabels.fair');
       case 1:
-        return 'Poor';
+        return t('review.ratingLabels.poor');
       default:
         return '';
     }
   };
 
+
   const activeRating = hoveredRating || rating;
+
 
   return (
     <>
@@ -78,10 +89,11 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
         }
       `}</style>
 
+
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Rate this Farmer"
+        title={t('review.title')}
       >
         <div
           className="animate-[scaleIn_0.2s_ease-out]"
@@ -89,19 +101,16 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
           {/* Header text */}
           <div className="mb-4">
             <p className="text-sm text-[#6B6B6B]">
-              How was your experience buying from{' '}
-              <span className="font-bold text-[#2D2D2D]">
-                {auction.farmer?.name}
-              </span>
-              ?
+              {t('review.experienceQuestion', { name: auction.farmer?.name })}
             </p>
           </div>
+
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Star Rating */}
             <div>
               <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                Rating
+                {t('review.ratingLabel')}
               </label>
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => {
@@ -134,10 +143,11 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
               </p>
             </div>
 
+
             {/* Comment */}
             <div>
               <label className="block text-sm font-bold text-[#2D2D2D] mb-1">
-                Comment <span className="text-[#6B6B6B] font-normal">(optional)</span>
+                {t('review.commentLabel')} <span className="text-[#6B6B6B] font-normal">({t('review.optional')})</span>
               </label>
               <textarea
                 value={comment}
@@ -145,12 +155,13 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
                 rows={4}
                 maxLength={500}
                 className="w-full rounded-xl border border-[#E5DED3] bg-white px-3 py-2 text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#ea7f61] focus:border-transparent resize-none"
-                placeholder="Share what went well, quality of produce, delivery, communication, etc."
+                placeholder={t('review.commentPlaceholder')}
               />
               <p className="text-xs text-[#6B6B6B] mt-1 text-right">
                 {comment.length}/500
               </p>
             </div>
+
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
@@ -161,7 +172,7 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
                 className="flex-1 inline-flex items-center justify-center gap-2 border-2 border-[#E5DED3] text-[#2D2D2D] font-bold py-2.5 px-4 rounded-xl bg-white hover:bg-[#F5F2ED] transition-all disabled:opacity-50"
               >
                 <X className="w-4 h-4" />
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
@@ -171,7 +182,7 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
                 {loading ? (
                   <LoadingSpinner size="sm" />
                 ) : (
-                  'Submit Review'
+                  t('review.submitButton')
                 )}
               </button>
             </div>
@@ -181,5 +192,6 @@ const ReviewModal = ({ isOpen, onClose, auction, onSuccess }) => {
     </>
   );
 };
+
 
 export default ReviewModal;
