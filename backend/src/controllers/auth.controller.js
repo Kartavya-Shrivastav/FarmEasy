@@ -228,3 +228,96 @@ export const me = async (req, res) => {
     }
   });
 };
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, errors: errors.array() });
+    }
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    // For security, respond the same even if user not found
+    if (!user) {
+      return res.json({
+        success: true,
+        message: "If an account exists, a reset link has been sent to this email",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetTokenExpires;
+    await user.save();
+
+    const resetUrl = `${env.clientUrl}/reset-password?token=${resetToken}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your FarmEasy password",
+      html: `
+        <p>Hi ${user.name},</p>
+        <p>You requested to reset your password for your FarmEasy account.</p>
+        <p>Click the link below to choose a new password:</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <p>This link will expire in 1 hour. If you did not request this, you can safely ignore this email.</p>
+      `,
+    });
+
+    return res.json({
+      success: true,
+      message: "If an account exists, a reset link has been sent to this email",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, errors: errors.array() });
+    }
+
+    const { token } = req.query;
+    const { password } = req.body;
+
+    if (!token) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, message: "Token is required" });
+    }
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ success: false, message: "Invalid or expired token" });
+    }
+
+    user.password = password; // will be hashed by your pre('save') hook
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: "Password reset successfully. You can now log in with your new password.",
+    });
+  } catch (err) {
+    next(err);
+  }
+};

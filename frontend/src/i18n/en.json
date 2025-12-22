@@ -77,7 +77,15 @@
     "featureListProduce": "List your produce in minutes",
     "featureGetBids": "Get competitive bids instantly",
     "featureConnectVerified": "Connect with verified users",
-    "signupSuccessMessage": "Signup successful! Please check your email to verify your account."
+    "signupSuccessMessage": "Signup successful! Please check your email to verify your account.",
+    "forgotPasswordTitle": "Forgot Password",
+    "forgotPasswordSubtitle": "Enter your email and we’ll send you a link to reset your password.",
+    "resetEmailSent": "If an account exists, a reset link has been sent to this email.",
+    "resetEmailSentToast": "If this email exists, a reset link has been sent.",
+    "resetEmailError": "Failed to send reset link. Please try again.",
+    "sending": "Sending...",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login"
   },
   "marketplace": {
     "title": "Marketplace",

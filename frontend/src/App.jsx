@@ -28,7 +28,8 @@ import {
   BadgeCheck
 } from 'lucide-react';
 import FarmerProfile from './features/profile/FarmerProfile';
-
+import ForgotPasswordPage from './features/auth/ForgotPasswordPage';
+import ResetPasswordPage from './features/auth/ResetPasswordPage';
 
 // REDESIGNED HOMEPAGE COMPONENT
 const HomePage = () => {
@@ -545,6 +546,8 @@ function App() {
           <Route path="/profile/:userId" element={<FarmerProfile />} />
           <Route path="/farmer-profile" element={<FarmerProfile />} />
           <Route path="/profile" element={<FarmerProfile />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Route>
       </Routes>
     </Router>
