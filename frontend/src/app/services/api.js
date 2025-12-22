@@ -28,7 +28,29 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    console.log('=== API INTERCEPTOR DEBUG ===');
+    console.log('Error status:', error.response?.status);
+    console.log('Request URL:', originalRequest?.url);
+    console.log('Full URL:', originalRequest?.baseURL + originalRequest?.url);
+
+    // Check if this is an auth endpoint - be more flexible with the check
+    const url = originalRequest?.url || '';
+    const isAuthEndpoint = 
+      url.includes('login') ||
+      url.includes('signup') ||
+      url.includes('verify-email') ||
+      url.endsWith('/auth/login') ||
+      url.endsWith('/auth/signup');
+
+    console.log('Is auth endpoint?', isAuthEndpoint);
+
+    // Only handle token refresh for non-auth endpoints
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
+      console.log('Attempting token refresh...');
       originalRequest._retry = true;
 
       try {
@@ -38,17 +60,27 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
 
+        console.log('Token refresh successful');
         localStorage.setItem('accessToken', data.accessToken);
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
         return api(originalRequest);
       } catch (refreshError) {
+        console.log('REFRESH FAILED, PATH =', window.location.pathname);
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+          console.log('REDIRECTING TO /login FROM INTERCEPTOR');
+          window.location.href = '/login';
+        }
+
         return Promise.reject(refreshError);
       }
     }
 
+    console.log('Skipping interceptor, passing error through');
+    // For auth endpoints or other errors, just reject
     return Promise.reject(error);
   }
 );

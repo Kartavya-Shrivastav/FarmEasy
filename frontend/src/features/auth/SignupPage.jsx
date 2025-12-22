@@ -43,7 +43,10 @@ const SignupPage = () => {
 
 
     try {
-      const { data } = await api.post('/auth/signup', formData);
+      const { data } = await api.post('/auth/signup', formData, {
+        skipAuthRefresh: true
+      });
+
       
       if (data.success) {
         showSuccess(t('auth.signupSuccessMessage'));

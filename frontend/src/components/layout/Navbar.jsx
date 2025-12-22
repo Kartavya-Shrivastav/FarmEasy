@@ -6,8 +6,6 @@ import { clearUser } from '../../features/auth/authSlice';
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import api from '../../services/api';
 
-
-
 const Navbar = () => {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -16,13 +14,9 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-
-
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
-
 
   const handleLogout = async () => {
     try {
@@ -36,13 +30,9 @@ const Navbar = () => {
     }
   };
 
-
-
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
-
-
 
   return (
     <>
@@ -79,8 +69,6 @@ const Navbar = () => {
         }
       `}</style>
 
-
-
       <nav 
         className={`bg-linear-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
         style={isVisible ? {
@@ -88,8 +76,8 @@ const Navbar = () => {
         } : {}}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+          <div className="flex items-center justify-between h-16 relative">
+            {/* Logo - Left */}
             <Link 
               to="/" 
               className={`flex items-center gap-2 ${isVisible ? 'opacity-0' : 'opacity-0'}`}
@@ -102,13 +90,11 @@ const Navbar = () => {
               <span className="text-xl font-bold text-[#ea7f61]">FarmEasy</span>
             </Link>
 
-
-
-            {/* Desktop Nav Links */}
-            <div className="hidden md:flex items-center gap-6">
+            {/* Desktop Nav Links - CENTER */}
+            <div className="hidden md:flex items-center gap-6 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Link 
                 to="/marketplace" 
-                className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors whitespace-nowrap ${isVisible ? 'opacity-0' : 'opacity-0'}`}
                 style={isVisible ? {
                   animation: 'fadeIn 0.6s ease-out 0.3s forwards'
                 } : {}}
@@ -118,11 +104,10 @@ const Navbar = () => {
               
               {isAuthenticated && (
                 <>
-                  {/* ✅ FIXED: Hide My Profile for admin */}
                   {user?.role !== 'admin' && (
                     <Link 
                       to="/profile" 
-                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors whitespace-nowrap ${isVisible ? 'opacity-0' : 'opacity-0'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.4s forwards'
                       } : {}}
@@ -134,7 +119,7 @@ const Navbar = () => {
                   {user?.role === 'farmer' && (
                     <Link 
                       to="/my-auctions" 
-                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors whitespace-nowrap ${isVisible ? 'opacity-0' : 'opacity-0'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
@@ -146,7 +131,7 @@ const Navbar = () => {
                   {user?.role === 'admin' && (
                     <Link 
                       to="/admin" 
-                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors whitespace-nowrap ${isVisible ? 'opacity-0' : 'opacity-0'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
@@ -157,8 +142,6 @@ const Navbar = () => {
                 </>
               )}
             </div>
-
-
 
             {/* Desktop Right Side */}
             <div className="hidden md:flex items-center gap-4">
@@ -215,8 +198,6 @@ const Navbar = () => {
               )}
             </div>
 
-
-
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -235,8 +216,6 @@ const Navbar = () => {
               </svg>
             </button>
           </div>
-
-
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
@@ -257,7 +236,6 @@ const Navbar = () => {
                 
                 {isAuthenticated && (
                   <>
-                    {/* ✅ FIXED: Hide My Profile for admin */}
                     {user?.role !== 'admin' && (
                       <Link
                         to="/profile"
@@ -290,13 +268,9 @@ const Navbar = () => {
                   </>
                 )}
 
-
-
                 <div className="border-t border-[#ea7f61]/30 pt-3 px-4">
                   <LanguageSwitcher />
                 </div>
-
-
 
                 {isAuthenticated ? (
                   <div className="border-t border-[#ea7f61]/30 pt-3 px-4 space-y-2">
@@ -334,7 +308,5 @@ const Navbar = () => {
     </>
   );
 };
-
-
 
 export default Navbar;

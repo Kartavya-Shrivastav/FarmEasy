@@ -28,7 +28,19 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    console.log('=== API INTERCEPTOR ===');
+    console.log('Status:', error.response?.status);
+    console.log('Skip refresh?', originalRequest.skipAuthRefresh);
+
+    // Check custom flag to skip refresh for auth endpoints
+    if (originalRequest.skipAuthRefresh) {
+      console.log('Skipping refresh due to skipAuthRefresh flag');
+      return Promise.reject(error);
+    }
+
+    // Only handle token refresh for 401 errors
     if (error.response?.status === 401 && !originalRequest._retry) {
+      console.log('Attempting token refresh...');
       originalRequest._retry = true;
 
       try {
@@ -38,13 +50,22 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
 
+        console.log('Token refresh successful');
         localStorage.setItem('accessToken', data.accessToken);
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
         return api(originalRequest);
       } catch (refreshError) {
+        console.log('REFRESH FAILED');
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+
+        // Only redirect if not already on auth pages
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/login' && currentPath !== '/signup') {
+          console.log('Redirecting to /login');
+          window.location.href = '/login';
+        }
+
         return Promise.reject(refreshError);
       }
     }
