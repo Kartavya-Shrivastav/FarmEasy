@@ -106,7 +106,7 @@ const Navbar = () => {
 
 
             {/* Desktop Nav Links */}
-            <div className=" hidden md:flex items-center gap-1-0 absolute left-1/2 -translate-x-1/2">
+            <div className=" hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
               <Link 
                 to="/marketplace" 
                 className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
