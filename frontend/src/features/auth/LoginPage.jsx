@@ -37,30 +37,66 @@ const LoginPage = () => {
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    console.log('=== LOGIN ATTEMPT ===');
+    
+    if (!formData.email || !formData.password) {
+      const errorMsg = 'Please fill in all fields';
+      setError(errorMsg);
+      showError(errorMsg);
+      return;
+    }
+
     setLoading(true);
     setError('');
 
-
     try {
-      const { data } = await api.post('/auth/login', formData);
+      console.log('Sending login request...');
+      
+      // Add skipAuthRefresh flag to prevent interceptor from running
+      const { data } = await api.post('/auth/login', formData, {
+        skipAuthRefresh: true  // ← THIS IS THE KEY FIX
+      });
+      
+      console.log('Login response:', data);
       
       if (data.success) {
         localStorage.setItem('accessToken', data.accessToken);
         dispatch(setUser(data.user));
         showSuccess(t('auth.welcomeBack', { name: data.user.name }));
-        navigate('/marketplace');
+        
+        setTimeout(() => {
+          navigate('/marketplace', { replace: true });
+        }, 100);
+      } else {
+        throw new Error(data.message || 'Login failed');
       }
 
-
     } catch (err) {
-      const errorMsg = err.response?.data?.message || t('auth.loginError');
+      console.error('=== LOGIN ERROR ===');
+      console.error('Status:', err.response?.status);
+      console.error('Message:', err.response?.data?.message);
+      
+      const errorMsg = err.response?.data?.message || err.message || 'Login failed';
       setError(errorMsg);
       showError(errorMsg);
+      
+      // Clear only password
+      setFormData(prev => ({
+        ...prev,
+        password: ''
+      }));
     } finally {
       setLoading(false);
+      console.log('=== LOGIN COMPLETE ===');
     }
   };
+
+
 
 
   return (
@@ -195,7 +231,18 @@ const LoginPage = () => {
               )}
 
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form 
+                onSubmit={handleSubmit} 
+                className="space-y-5" 
+                noValidate
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+              >
+
                 {/* Email Input */}
                 <div>
                   <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
@@ -253,7 +300,8 @@ const LoginPage = () => {
 
                 {/* Submit Button */}
                 <button
-                  type="submit"
+                  type="button"  // Changed from "submit" to "button"
+                  onClick={handleSubmit}  // Added explicit onClick
                   disabled={loading}
                   className="w-full bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
