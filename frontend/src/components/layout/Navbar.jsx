@@ -88,7 +88,8 @@ const Navbar = () => {
         } : {}}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+          <div className="relative flex items-center h-16">
+
             {/* Logo */}
             <Link 
               to="/" 
@@ -105,7 +106,7 @@ const Navbar = () => {
 
 
             {/* Desktop Nav Links */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className=" hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
               <Link 
                 to="/marketplace" 
                 className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
@@ -161,60 +162,62 @@ const Navbar = () => {
 
 
             {/* Desktop Right Side */}
-            <div className="hidden md:flex items-center gap-4">
-              <div 
-                className={`${isVisible ? 'opacity-0' : 'opacity-0'}`}
-                style={isVisible ? {
-                  animation: 'fadeIn 0.6s ease-out 0.4s forwards'
-                } : {}}
-              >
-                <LanguageSwitcher />
-              </div>
-              
-              {isAuthenticated ? (
-                <div className="flex items-center gap-4">
-                  <span 
-                    className={`text-sm text-[#3a3a3a] font-bold ${isVisible ? 'opacity-0' : 'opacity-0'}`}
-                    style={isVisible ? {
-                      animation: 'fadeIn 0.6s ease-out 0.5s forwards'
-                    } : {}}
-                  >
-                    {user?.name}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
-                    style={isVisible ? {
-                      animation: 'fadeIn 0.6s ease-out 0.6s forwards'
-                    } : {}}
-                  >
-                    {t('nav.logout')}
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link 
-                    to="/login" 
-                    className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
-                    style={isVisible ? {
-                      animation: 'fadeIn 0.6s ease-out 0.5s forwards'
-                    } : {}}
-                  >
-                    {t('nav.login')}
-                  </Link>
-                  <Link 
-                    to="/signup" 
-                    className={`bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md ${isVisible ? 'opacity-0' : 'opacity-0'}`}
-                    style={isVisible ? {
-                      animation: 'fadeIn 0.6s ease-out 0.6s forwards'
-                    } : {}}
-                  >
-                    {t('nav.signup')}
-                  </Link>
-                </div>
-              )}
-            </div>
+            <div className="ml-auto hidden md:flex items-center gap-4">
 
+              <div className="hidden md:flex items-center gap-4">
+                <div 
+                  className={`${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                  style={isVisible ? {
+                    animation: 'fadeIn 0.6s ease-out 0.4s forwards'
+                  } : {}}
+                >
+                  <LanguageSwitcher />
+                </div>
+                
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-4">
+                    <span 
+                      className={`text-sm text-[#3a3a3a] font-bold ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      style={isVisible ? {
+                        animation: 'fadeIn 0.6s ease-out 0.5s forwards'
+                      } : {}}
+                    >
+                      {user?.name}
+                    </span>
+                    <button
+                      onClick={handleLogout}
+                      className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      style={isVisible ? {
+                        animation: 'fadeIn 0.6s ease-out 0.6s forwards'
+                      } : {}}
+                    >
+                      {t('nav.logout')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Link 
+                      to="/login" 
+                      className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      style={isVisible ? {
+                        animation: 'fadeIn 0.6s ease-out 0.5s forwards'
+                      } : {}}
+                    >
+                      {t('nav.login')}
+                    </Link>
+                    <Link 
+                      to="/signup" 
+                      className={`bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      style={isVisible ? {
+                        animation: 'fadeIn 0.6s ease-out 0.6s forwards'
+                      } : {}}
+                    >
+                      {t('nav.signup')}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
 
 
             {/* Mobile Hamburger Button */}
