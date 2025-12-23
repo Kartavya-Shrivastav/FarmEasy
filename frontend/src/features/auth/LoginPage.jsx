@@ -9,6 +9,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { showSuccess, showError } from '../../utils/toast';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import kisanImage from '../../assets/kissan4.png';
 
 
 const LoginPage = () => {
@@ -140,7 +141,7 @@ const LoginPage = () => {
           {/* Background Image with Blur */}
           <div className="absolute inset-0">
             <img
-              src="src/assets/kissan4.png"
+              src={kisanImage}
               alt="Farmer background"
               className="w-full h-full object-cover filter blur-[5px]"
             />

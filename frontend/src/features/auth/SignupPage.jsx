@@ -7,7 +7,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { showSuccess, showError } from '../../utils/toast';
 import { Mail, Lock, User, Phone, ArrowRight, UserCheck, ShoppingCart } from 'lucide-react';
-
+import kisanImage1 from '../../assets/kissan1.jpg';
 
 const SignupPage = () => {
   const { t } = useTranslation();
@@ -105,7 +105,7 @@ const SignupPage = () => {
           {/* Background Image with Blur */}
           <div className="absolute inset-0">
             <img
-              src="src/assets/kissan3.png"
+              src={kisanImage1}
               alt="Farmer background"
               className="w-full h-full object-cover filter blur-sm"
             />

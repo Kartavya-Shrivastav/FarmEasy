@@ -81,7 +81,7 @@ const ResetPasswordPage = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-5" inoValidate>
             <div>
               <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
                 {t('auth.newPassword') || 'New password'}
