@@ -146,7 +146,9 @@ export const lockDeal = async (req, res, next) => {
       isLocked: true,
       lockedAt: new Date(),
       buyer: auction.currentHighestBidder,
-      amount: auction.currentHighestBidAmount
+      amount: auction.currentHighestBidAmount,
+      isPaid: false,        
+      paidAt: null          
     };
 
     await auction.save();

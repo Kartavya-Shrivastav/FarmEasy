@@ -8,7 +8,7 @@ export const loadRazorpay = () => {
   });
 };
 
-export const openRazorpayCheckout = async (options, onSuccess, onFailure) => {
+export const openRazorpayCheckout = async (options) => {
   const loaded = await loadRazorpay();
   
   if (!loaded) {
@@ -16,13 +16,6 @@ export const openRazorpayCheckout = async (options, onSuccess, onFailure) => {
     return;
   }
 
-  const rzp = new window.Razorpay({
-    ...options,
-    handler: onSuccess,
-    modal: {
-      ondismiss: onFailure,
-    },
-  });
-
+  const rzp = new window.Razorpay(options); // ✅ Just use options as-is
   rzp.open();
 };

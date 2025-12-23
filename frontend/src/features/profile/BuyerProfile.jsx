@@ -120,14 +120,8 @@ const BuyerProfile = () => {
       };
 
 
-      openRazorpayCheckout(
-        options,
-        () => {},
-        () => {
-          console.log('Payment cancelled');
-          setTimeout(() => fetchProfile(), 1000);
-        }
-      );
+      openRazorpayCheckout(options); // ✅ Just pass options
+
     } catch (error) {
       showError(error.response?.data?.message || t('profile.paymentFailed'));
     }
