@@ -30,7 +30,7 @@ import {
 import FarmerProfile from './features/profile/FarmerProfile';
 import ForgotPasswordPage from './features/auth/ForgotPasswordPage';
 import ResetPasswordPage from './features/auth/ResetPasswordPage';
-
+import homeVideo from './assets/homeVideo.mp4';
 // REDESIGNED HOMEPAGE COMPONENT
 const HomePage = () => {
   const { t } = useTranslation();
@@ -192,12 +192,12 @@ const HomePage = () => {
             animation: 'fadeIn 1s ease-in forwards'
           }}
         >
-          <img
+          {/* <img
             src="src/assets/kissan2.png"
             alt={t('home.hero.imageAlt')}
             className="w-full h-full object-cover scale-105 filter blur-[3px]"
-          />
-
+          /> */}
+          <video src={homeVideo} autoPlay loop muted className="w-full h-full object-cover scale-105 filter" >Your browser does not support the video tag</video>
 
           {/* Gradient Overlay */}
           <div
