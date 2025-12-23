@@ -26,7 +26,17 @@ app.set("trust proxy", 1);
 app.use(helmet());
 app.use(
   cors({
-    origin: env.clientUrl,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigin = env.clientUrl.endsWith('/') ? env.clientUrl.slice(0, -1) : env.clientUrl;
+      if (origin === allowedOrigin) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true
   })
 );
