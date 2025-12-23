@@ -182,7 +182,7 @@ const HomePage = () => {
 
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
+      <section className="relative min-h-[100svh] flex items-center overflow-hidden">
 
 
         {/* Background Image */}
@@ -201,8 +201,7 @@ const HomePage = () => {
 
           {/* Gradient Overlay */}
           <div
-            className="absolute inset-0 bg-linear-to-r 
-            from-black/65 via-black/40 to-transparent"
+            className="absolute inset-0 bg-linear-to-r from-black/65 via-black/40 to-transparent"
           />
         </div>
 
