@@ -7,7 +7,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import api from '../../services/api';
 import { showSuccess, showError } from '../../utils/toast';
 import { Mail, Lock, User, Phone, ArrowRight, UserCheck, ShoppingCart } from 'lucide-react';
-import kisanImage1 from '../../assets/kissan1.jpg';
+import kisanImage1 from '../../assets/kissan1.png';
 
 const SignupPage = () => {
   const { t } = useTranslation();
