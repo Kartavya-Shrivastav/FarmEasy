@@ -5,6 +5,7 @@ import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { clearUser } from '../../features/auth/authSlice';
 import LanguageSwitcher from '../common/LanguageSwitcher';
 import api from '../../services/api';
+import { useLocation } from 'react-router-dom';
 
 
 
@@ -15,6 +16,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  const [scrolled, setScrolled] = useState(false);
 
 
 
@@ -22,6 +26,22 @@ const Navbar = () => {
     setIsVisible(true);
   }, []);
 
+  useEffect(() => {
+    if (!isHomePage) {
+      // On non-home pages: always show normal navbar
+      setScrolled(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 80);
+    };
+
+    handleScroll(); // run once on mount
+    window.addEventListener('scroll', handleScroll);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHomePage]);
 
 
   const handleLogout = async () => {
@@ -81,12 +101,19 @@ const Navbar = () => {
 
 
 
-      <nav 
-        className={`bg-linear-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] border-b border-[#ea7f61]/30 sticky top-0 z-50 shadow-md backdrop-blur-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
-        style={isVisible ? {
-          animation: 'slideDown 0.6s ease-out forwards'
-        } : {}}
+      <nav
+        className={`
+          fixed top-0 left-0 w-full z-50 transition-all duration-300
+          ${
+            isHomePage && !scrolled
+              ? 'bg-transparent'
+              : 'bg-linear-to-r from-[#F5F2ED] via-[#F5F2ED] to-[#F5F2ED] backdrop-blur-md shadow-md border-b border-[#ea7f61]/30'
+          }
+          ${isVisible ? 'opacity-0' : 'opacity-0'}
+        `}
+        style={isVisible ? { animation: 'slideDown 0.6s ease-out forwards' } : {}}
       >
+
         <div className="container mx-auto px-4">
           <div className="relative flex items-center h-16">
 
@@ -100,7 +127,12 @@ const Navbar = () => {
               } : {}}
             >
               <span className="text-2xl">🌾</span>
-              <span className="text-xl font-bold text-[#ea7f61]">FarmEasy</span>
+              <span
+                className={`text-xl font-bold transition-colors ${isHomePage && !scrolled ? 'text-white' : 'text-[#ea7f61]'}`}
+              >
+                FarmEasy
+              </span>
+
             </Link>
 
 
@@ -109,7 +141,8 @@ const Navbar = () => {
             <div className=" hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
               <Link 
                 to="/marketplace" 
-                className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                className={`font-bold transition-colors ${ isHomePage && !scrolled ? 'text-white hover:text-[#F4A261]'
+                                                                                  : 'text-[#1a1a1a] hover:text-[#ea7f61]'}`}
                 style={isVisible ? {
                   animation: 'fadeIn 0.6s ease-out 0.3s forwards'
                 } : {}}
@@ -123,7 +156,8 @@ const Navbar = () => {
                   {user?.role !== 'admin' && (
                     <Link 
                       to="/profile" 
-                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`font-bold transition-colors ${ isHomePage && !scrolled ? 'text-white hover:text-[#F4A261]'
+                                                                                  : 'text-[#1a1a1a] hover:text-[#ea7f61]'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.4s forwards'
                       } : {}}
@@ -135,7 +169,8 @@ const Navbar = () => {
                   {user?.role === 'farmer' && (
                     <Link 
                       to="/my-auctions" 
-                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`font-bold transition-colors ${ isHomePage && !scrolled ? 'text-white hover:text-[#F4A261]'
+                                                                                  : 'text-[#1a1a1a] hover:text-[#ea7f61]'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
@@ -147,7 +182,8 @@ const Navbar = () => {
                   {user?.role === 'admin' && (
                     <Link 
                       to="/admin" 
-                      className={`text-[#1a1a1a] hover:text-[#ea7f61] font-bold transition-colors ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`font-bold transition-colors ${ isHomePage && !scrolled ? 'text-white hover:text-[#F4A261]'
+                                                                                  : 'text-[#1a1a1a] hover:text-[#ea7f61]'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
@@ -171,13 +207,13 @@ const Navbar = () => {
                     animation: 'fadeIn 0.6s ease-out 0.4s forwards'
                   } : {}}
                 >
-                  <LanguageSwitcher />
+                  <LanguageSwitcher isTransparent={isHomePage && !scrolled} />
                 </div>
                 
                 {isAuthenticated ? (
                   <div className="flex items-center gap-4">
                     <span 
-                      className={`text-sm text-[#3a3a3a] font-bold ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`text-sm font-bold transition-colors ${isHomePage && !scrolled ? 'text-white' : 'text-[#3a3a3a]'}`}
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
@@ -198,7 +234,14 @@ const Navbar = () => {
                   <div className="flex items-center gap-2">
                     <Link 
                       to="/login" 
-                      className={`bg-white hover:bg-[#ea7f61] text-[#1a1a1a] hover:text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2 border-[#ea7f61] shadow-sm ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2
+                        ${
+                          isHomePage && !scrolled
+                            ? 'bg-white/20 text-white border-white/30 backdrop-blur-md hover:bg-white/30'
+                            : 'bg-white text-[#1a1a1a] border-[#ea7f61] hover:bg-[#ea7f61] hover:text-white'
+                        }
+                      `}
+
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.5s forwards'
                       } : {}}
@@ -207,7 +250,14 @@ const Navbar = () => {
                     </Link>
                     <Link 
                       to="/signup" 
-                      className={`bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-2 px-4 rounded-xl transition-all duration-200 shadow-md ${isVisible ? 'opacity-0' : 'opacity-0'}`}
+                      className={`font-bold py-2 px-4 rounded-xl transition-all duration-200 border-2
+                        ${
+                          isHomePage && !scrolled
+                            ? 'bg-white/20 text-white border-white/30 backdrop-blur-md hover:bg-white/30'
+                            : 'bg-white text-[#1a1a1a] border-[#ea7f61] hover:bg-[#ea7f61] hover:text-white'
+                        }
+                      `}
+
                       style={isVisible ? {
                         animation: 'fadeIn 0.6s ease-out 0.6s forwards'
                       } : {}}
@@ -296,7 +346,7 @@ const Navbar = () => {
 
 
                 <div className="border-t border-[#ea7f61]/30 pt-3 px-4">
-                  <LanguageSwitcher />
+                  <LanguageSwitcher isTransparent={isHomePage && !scrolled} />
                 </div>
 
 
