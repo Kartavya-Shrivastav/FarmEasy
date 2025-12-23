@@ -77,7 +77,7 @@ export const verifyEmail = async (req, res, next) => {
     });
 
     console.log('User found:', user ? 'YES' : 'NO');
-    
+
     if (user) {
       console.log('User email:', user.email);
       console.log('Token in DB:', user.emailVerificationToken);
@@ -153,14 +153,14 @@ export const login = async (req, res, next) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: env.nodeEnv === "production",
-      sameSite: "lax",
+      sameSite: env.nodeEnv === "production" ? "none" : "lax",
       maxAge: 15 * 60 * 1000
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: env.nodeEnv === "production",
-      sameSite: "lax",
+      sameSite: env.nodeEnv === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
