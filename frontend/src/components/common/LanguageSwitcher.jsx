@@ -1,7 +1,9 @@
+// LanguageSwitcher.jsx
+
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, Check } from 'lucide-react';
 
-const LanguageSwitcher = () => {
+const LanguageSwitcher = ({ isTransparent = false }) => {
   const { i18n } = useTranslation();
 
   const languages = [
@@ -10,6 +12,12 @@ const LanguageSwitcher = () => {
   ];
 
   const currentLanguage = languages.find(l => l.code === i18n.language) || languages[0];
+
+  // Dynamic styles based on transparent state
+  const buttonBg = isTransparent ? 'hover:bg-white/20' : 'hover:bg-white/80';
+  const buttonBorder = isTransparent ? 'hover:border-white/30' : 'hover:border-[#E5DED3]';
+  const textColor = isTransparent ? 'text-white' : 'text-[#2D2D2D]';
+  const iconColor = isTransparent ? 'text-white/80 group-hover:text-white' : 'text-[#6B6B6B] group-hover:text-[#ea7f61]';
 
   return (
     <>
@@ -28,12 +36,20 @@ const LanguageSwitcher = () => {
 
       <div className="relative group">
         {/* Trigger Button */}
-        <button className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/80 transition-all border border-transparent hover:border-[#E5DED3]">
-          <span className="text-xl">{currentLanguage.flag}</span>
-          <span className="text-sm font-bold text-[#2D2D2D] hidden md:block">
+        <button className={`flex items-center gap-2 px-3 py-2 rounded-xl ${buttonBg} transition-all duration-300 border border-transparent ${buttonBorder}`}>
+          <span
+            className={`text-md font-bold transition-colors duration-300
+              ${isTransparent ? 'text-white' : 'text-[#2D2D2D]'}
+            `}
+          >
+            {currentLanguage.flag}
+          </span>
+
+
+          <span className={`text-sm font-bold ${textColor} hidden md:block transition-colors duration-300`}>
             {currentLanguage.label}
           </span>
-          <ChevronDown className="w-4 h-4 text-[#6B6B6B] group-hover:text-[#ea7f61] transition-colors" />
+          <ChevronDown className={`w-4 h-4 ${iconColor} transition-colors duration-300`} />
         </button>
         
         {/* Dropdown Menu */}
@@ -60,7 +76,8 @@ const LanguageSwitcher = () => {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{lang.flag}</span>
+                  <span className="text-sm font-bold text-[#2D2D2D]"> {lang.flag} </span>
+
                   <span className={`text-sm font-bold ${isActive ? 'text-[#ea7f61]' : 'text-[#2D2D2D]'}`}>
                     {lang.label}
                   </span>
