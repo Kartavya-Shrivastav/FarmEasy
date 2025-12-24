@@ -21,7 +21,7 @@ const auctionSchema = new Schema(
       village: { type: String, trim: true }
     },
 
-    images: [{ url: String, publicId: String }], // add Cloudinary later
+    images: [{ url: String, publicId: String }], 
 
     dateOfEntry: { type: Date, required: true },
     expiresAt: { type: Date, required: true },

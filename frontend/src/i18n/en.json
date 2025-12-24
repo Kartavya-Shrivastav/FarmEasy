@@ -79,7 +79,7 @@
     "featureConnectVerified": "Connect with verified users",
     "signupSuccessMessage": "Signup successful! Please check your email to verify your account.",
     "forgotPasswordTitle": "Forgot Password",
-    "forgotPasswordSubtitle": "Enter your email and we’ll send you a link to reset your password.",
+    "forgotPasswordSubtitle": "Enter your email and we'll send you a link to reset your password.",
     "resetEmailSent": "If an account exists, a reset link has been sent to this email.",
     "resetEmailSentToast": "If this email exists, a reset link has been sent.",
     "resetEmailError": "Failed to send reset link. Please try again.",
@@ -207,6 +207,24 @@
     "paymentSuccess": "Payment successful! 🎉",
     "paymentVerifyFailed": "Payment verification failed",
     "paymentFailed": "Failed to process payment"
+  },
+  "review": {
+    "title": "Rate your experience",
+    "experienceQuestion": "How was your experience with {{name}}?",
+    "ratingLabel": "Overall rating",
+    "commentLabel": "Write a review",
+    "optional": "optional",
+    "commentPlaceholder": "Share details about the quality, delivery and overall experience.",
+    "submitButton": "Submit review",
+    "submitSuccess": "Thank you! Your review has been submitted.",
+    "submitError": "Could not submit review. Please try again.",
+    "ratingLabels": {
+      "excellent": "Excellent – highly recommended",
+      "veryGood": "Very good – great experience",
+      "good": "Good – satisfied with the deal",
+      "fair": "Fair – could be better",
+      "poor": "Poor – not satisfied"
+    }
   },
   "createAuction": {
     "title": "Create New Auction",
@@ -442,24 +460,6 @@
       "registerFarmer": "Register as Farmer",
       "registerBuyer": "Register as Buyer",
       "viewMarketplace": "View Marketplace"
-    },
-    "review": {
-      "title": "Rate this Farmer",
-      "experienceQuestion": "How was your experience buying from {{name}}?",
-      "ratingLabel": "Rating",
-      "ratingLabels": {
-        "excellent": "Excellent! 🌟",
-        "veryGood": "Very good",
-        "good": "Good",
-        "fair": "Fair",
-        "poor": "Poor"
-      },
-      "commentLabel": "Comment",
-      "optional": "optional",
-      "commentPlaceholder": "Share what went well, quality of produce, delivery, communication, etc.",
-      "submitButton": "Submit Review",
-      "submitSuccess": "Review submitted successfully!",
-      "submitError": "Failed to submit review"
     }
   },
   "footer": {
@@ -551,5 +551,4 @@
     "successfulPurchases": "Successful Purchases",
     "fromFarmer": "From: {{name}}"
   }
-
 }
