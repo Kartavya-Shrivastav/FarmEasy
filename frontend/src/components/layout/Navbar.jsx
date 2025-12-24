@@ -19,6 +19,7 @@ const Navbar = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const [scrolled, setScrolled] = useState(false);
+  const needsOffset = !isHomePage;
 
 
 
@@ -384,6 +385,7 @@ const Navbar = () => {
           )}
         </div>
       </nav>
+      {needsOffset && <div className="h-16" />}
     </>
   );
 };
