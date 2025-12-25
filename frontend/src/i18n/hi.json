@@ -85,7 +85,17 @@
     "resetEmailError": "रीसेट लिंक भेजने में समस्या आई। कृपया पुनः प्रयास करें।",
     "sending": "भेजा जा रहा है...",
     "sendResetLink": "रीसेट लिंक भेजें",
-    "backToLogin": "लॉगिन पर वापस जाएं"
+    "backToLogin": "लॉगिन पर वापस जाएं",
+    "resetPasswordTitle": "पासवर्ड रीसेट करें",
+    "resetPasswordSubtitle": "नीचे अपना नया पासवर्ड दर्ज करें।",
+    "newPassword": "नया पासवर्ड",
+    "resetting": "रीसेट हो रहा है...",
+    "resetPasswordButton": "पासवर्ड रीसेट करें",
+    "invalidResetToken": "अमान्य या गायब रीसेट टोकन",
+    "passwordTooShort": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए",
+    "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते",
+    "resetPasswordSuccess": "पासवर्ड सफलतापूर्वक रीसेट हो गया!",
+    "resetPasswordError": "पासवर्ड रीसेट करने में विफल। लिंक अमान्य या समाप्त हो सकता है।"
   },
   "marketplace": {
     "title": "बाज़ार",

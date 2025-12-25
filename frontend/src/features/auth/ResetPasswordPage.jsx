@@ -20,20 +20,20 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     if (!token) {
       setStatus('error');
-      setError('Invalid or missing reset token');
+      setError(t('auth.invalidResetToken'));
     }
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!token) return;
 
     if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordTooShort'));
       return;
     }
     if (password !== confirm) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDoNotMatch'));
       return;
     }
 
@@ -47,7 +47,7 @@ const ResetPasswordPage = () => {
         { skipAuthRefresh: true }
       );
 
-      showSuccess(data.message || 'Password reset successfully');
+      showSuccess(data.message || t('auth.resetPasswordSuccess'));
       setStatus('success');
 
       setTimeout(() => {
@@ -55,8 +55,7 @@ const ResetPasswordPage = () => {
       }, 2000);
     } catch (err) {
       const msg =
-        err.response?.data?.message ||
-        'Failed to reset password. The link may be invalid or expired.';
+        err.response?.data?.message || t('auth.resetPasswordError');
       showError(msg);
       setError(msg);
       setStatus('error');
@@ -68,11 +67,10 @@ const ResetPasswordPage = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-[#E5DED3]">
           <h1 className="text-2xl font-bold text-[#2D2D2D] mb-2">
-            {t('auth.resetPasswordTitle') || 'Reset Password'}
+            {t('auth.resetPasswordTitle')}
           </h1>
           <p className="text-[#6B6B6B] mb-6">
-            {t('auth.resetPasswordSubtitle') ||
-              'Enter your new password below.'}
+            {t('auth.resetPasswordSubtitle')}
           </p>
 
           {error && (
@@ -81,10 +79,10 @@ const ResetPasswordPage = () => {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5" inoValidate>
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>
               <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                {t('auth.newPassword') || 'New password'}
+                {t('auth.newPassword')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B]" />
@@ -101,7 +99,7 @@ const ResetPasswordPage = () => {
 
             <div>
               <label className="block text-sm font-bold text-[#2D2D2D] mb-2">
-                {t('auth.confirmPassword') || 'Confirm password'}
+                {t('auth.confirmPassword')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B6B6B]" />
@@ -122,8 +120,8 @@ const ResetPasswordPage = () => {
               className="w-full bg-[#ea7f61] hover:bg-[#d85f3f] text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {status === 'submitting'
-                ? t('auth.resetting') || 'Resetting...'
-                : t('auth.resetPasswordButton') || 'Reset password'}
+                ? t('auth.resetting')
+                : t('auth.resetPasswordButton')}
             </button>
           </form>
 
@@ -132,7 +130,7 @@ const ResetPasswordPage = () => {
               to="/login"
               className="text-sm text-[#6B6B6B] hover:text-[#2D2D2D]"
             >
-              ← {t('auth.backToLogin') || 'Back to login'}
+              ← {t('auth.backToLogin')}
             </Link>
           </div>
         </div>

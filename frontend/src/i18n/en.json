@@ -85,7 +85,17 @@
     "resetEmailError": "Failed to send reset link. Please try again.",
     "sending": "Sending...",
     "sendResetLink": "Send reset link",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordSubtitle": "Enter your new password below.",
+    "newPassword": "New password",
+    "resetting": "Resetting...",
+    "resetPasswordButton": "Reset password",
+    "invalidResetToken": "Invalid or missing reset token",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "resetPasswordSuccess": "Password reset successfully!",
+    "resetPasswordError": "Failed to reset password. The link may be invalid or expired."
   },
   "marketplace": {
     "title": "Marketplace",
