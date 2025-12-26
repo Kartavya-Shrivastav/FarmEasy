@@ -1,5 +1,5 @@
 # LinkedIn Post Links:
-<img width="4096" height="4096" alt="image" src="https://github.com/user-attachments/assets/806c08e8-bd2e-40a7-af3c-a1a0646652f5" />
+<img src="https://github.com/user-attachments/assets/806c08e8-bd2e-40a7-af3c-a1a0646652f5" width="200" />
 
 ## Kartavya Shrivastav | Roll 61 | 12323198
 ### [LinkedIn Post Link Here](https://www.linkedin.com/posts/kartavyashrivastav_webdevelopment-fullstack-mern-activity-7409447999908528128-r6NW?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAEaQa5IBiDQKmiAgLSjzVA97n1sl7GOSobk)
