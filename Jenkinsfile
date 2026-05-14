@@ -43,6 +43,8 @@ pipeline {
             backend=${BACKEND_IMAGE} -n farmeasy
           kubectl set image deployment/notification-worker \
             worker=${WORKER_IMAGE} -n farmeasy
+          kubectl rollout restart deployment/farmeasy-backend -n farmeasy
+          kubectl rollout restart deployment/notification-worker -n farmeasy
           kubectl rollout status deployment/farmeasy-backend \
             -n farmeasy --timeout=120s
         """
