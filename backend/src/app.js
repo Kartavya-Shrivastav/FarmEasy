@@ -15,9 +15,38 @@ import profileRouter from "./routes/profile.routes.js";
 import reviewRouter from "./routes/review.routes.js";
 import uploadRouter from "./routes/upload.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
-
+import promClient from 'prom-client';
 
 const app = express();
+
+// Prometheus metrics
+const collectDefaultMetrics = promClient.collectDefaultMetrics;
+collectDefaultMetrics({ timeout: 5000 });
+
+const httpRequestDuration = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'HTTP request duration in seconds',
+  labelNames: ['method', 'route', 'status_code'],
+  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5]
+});
+
+// Metrics middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = (Date.now() - start) / 1000;
+    httpRequestDuration
+      .labels(req.method, req.route?.path || req.path, res.statusCode)
+      .observe(duration);
+  });
+  next();
+});
+
+// Metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', promClient.register.contentType);
+  res.end(await promClient.register.metrics());
+});
 
 // Enable trust proxy for Socket.io
 app.set("trust proxy", 1);
