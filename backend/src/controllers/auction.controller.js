@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { validationResult } from "express-validator";
 import { Auction } from "../models/auction.model.js";
+import { getCache, setCache, invalidateCache, invalidateCachePattern } from "../utils/cache.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 
 export const createAuctionRequest = async (req, res, next) => {
   try {
@@ -8,12 +10,10 @@ export const createAuctionRequest = async (req, res, next) => {
     if (!errors.isEmpty()) {
       return res.status(StatusCodes.BAD_REQUEST).json({ success: false, errors: errors.array() });
     }
-
     if (req.user.role !== "farmer") {
       return res.status(StatusCodes.FORBIDDEN).json({ success: false, message: "Only farmers can create listings" });
     }
 
-    // Parse images if they come as JSON string (from form-data)
     let images = [];
     if (req.body.images) {
       try {
@@ -41,12 +41,14 @@ export const createAuctionRequest = async (req, res, next) => {
 
     const auction = await Auction.create(payload);
 
+    // Invalidate marketplace listing cache since a new auction was added
+    await invalidateCachePattern("auctions:list:*");
+
     return res.status(StatusCodes.CREATED).json({ success: true, auction });
   } catch (err) {
     next(err);
   }
 };
-
 
 export const listMarketAuctions = async (req, res, next) => {
   try {
@@ -59,35 +61,29 @@ export const listMarketAuctions = async (req, res, next) => {
       status = "APPROVED"
     } = req.query;
 
-    const filter = { status };
+    // Build a cache key from all query params
+    const cacheKey = `auctions:list:${JSON.stringify({ q, category, minPrice, maxPrice, state, status })}`;
 
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.json({ success: true, auctions: cached, fromCache: true });
+    }
+
+    const filter = { status };
     if (category) filter.category = category;
     if (state) filter["location.state"] = state;
 
-    //Use $expr to check currentHighestBidAmount OR minPrice
     if (minPrice || maxPrice) {
       filter.$expr = { $and: [] };
-      
-      // Use currentHighestBidAmount if it exists, otherwise fall back to minPrice
       const currentPrice = {
         $cond: {
-          if: { $gt: ['$currentHighestBidAmount', 0] },
-          then: '$currentHighestBidAmount',
-          else: '$minPrice'
+          if: { $gt: ["$currentHighestBidAmount", 0] },
+          then: "$currentHighestBidAmount",
+          else: "$minPrice"
         }
       };
-      
-      if (minPrice) {
-        filter.$expr.$and.push({
-          $gte: [currentPrice, Number(minPrice)]
-        });
-      }
-      
-      if (maxPrice) {
-        filter.$expr.$and.push({
-          $lte: [currentPrice, Number(maxPrice)]
-        });
-      }
+      if (minPrice) filter.$expr.$and.push({ $gte: [currentPrice, Number(minPrice)] });
+      if (maxPrice) filter.$expr.$and.push({ $lte: [currentPrice, Number(maxPrice)] });
     }
 
     if (q) {
@@ -102,6 +98,9 @@ export const listMarketAuctions = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .limit(50);
 
+    // Cache for 2 minutes (auction listings change frequently)
+    await setCache(cacheKey, auctions, 120);
+
     return res.json({ success: true, auctions });
   } catch (err) {
     next(err);
@@ -110,6 +109,13 @@ export const listMarketAuctions = async (req, res, next) => {
 
 export const getAuctionById = async (req, res, next) => {
   try {
+    const cacheKey = `auctions:single:${req.params.id}`;
+
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.json({ success: true, auction: cached, fromCache: true });
+    }
+
     const auction = await Auction.findById(req.params.id)
       .populate("farmer", "name role")
       .populate("currentHighestBidder", "name");
@@ -117,6 +123,9 @@ export const getAuctionById = async (req, res, next) => {
     if (!auction) {
       return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "Auction not found" });
     }
+
+    // Cache for 5 minutes
+    await setCache(cacheKey, auction, 300);
 
     return res.json({ success: true, auction });
   } catch (err) {
@@ -127,7 +136,6 @@ export const getAuctionById = async (req, res, next) => {
 export const lockDeal = async (req, res, next) => {
   try {
     const auction = await Auction.findById(req.params.id);
-
     if (!auction) {
       return res.status(StatusCodes.NOT_FOUND).json({ success: false, message: "Auction not found" });
     }
@@ -147,13 +155,22 @@ export const lockDeal = async (req, res, next) => {
       lockedAt: new Date(),
       buyer: auction.currentHighestBidder,
       amount: auction.currentHighestBidAmount,
-      isPaid: false,        
-      paidAt: null          
+      isPaid: false,
+      paidAt: null
     };
-
     await auction.save();
 
-    // Emit auction closed event
+    await publishEvent("auction.closed", {
+      auctionId: auction._id,
+      auctionTitle: auction.title,
+      finalAmount: auction.lockedDeal.amount
+    });
+
+    // Invalidate cache for this auction and listing
+    await invalidateCache(`auctions:single:${auction._id}`);
+    await invalidateCachePattern("auctions:list:*");
+
+    // Emit auction closed event via Socket.io
     const io = req.app.get("io");
     if (io) {
       io.to(`auction:${auction._id}`).emit("auction-closed", {

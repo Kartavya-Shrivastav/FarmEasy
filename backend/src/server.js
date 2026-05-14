@@ -3,9 +3,11 @@ import { Server } from "socket.io";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import { connectDB } from "./config/db.js";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
 
 const start = async () => {
   await connectDB();
+  await connectRabbitMQ();
 
   const server = http.createServer(app);
 

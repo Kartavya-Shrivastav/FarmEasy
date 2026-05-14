@@ -1,6 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import cloudinary from "../config/cloudinary.js";
-import streamifier from "streamifier";
+import { uploadToS3 } from "../utils/s3.js";
 
 export const uploadImages = async (req, res, next) => {
   try {
@@ -11,29 +10,7 @@ export const uploadImages = async (req, res, next) => {
       });
     }
 
-    const uploadPromises = req.files.map((file) => {
-      return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder: "farmeasy/products",
-            resource_type: "image"
-          },
-          (error, result) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve({
-                url: result.secure_url,
-                publicId: result.public_id
-              });
-            }
-          }
-        );
-
-        streamifier.createReadStream(file.buffer).pipe(uploadStream);
-      });
-    });
-
+    const uploadPromises = req.files.map((file) => uploadToS3(file));
     const uploadedImages = await Promise.all(uploadPromises);
 
     return res.json({

@@ -1,3 +1,13 @@
 .env
 backend/node_modules
 frontend/node_modules
+
+# SSH Keys
+infra/farmeasy-keypair
+infra/*.pem
+
+# Terraform
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/terraform.tfstate
+infra/terraform.tfstate.backup

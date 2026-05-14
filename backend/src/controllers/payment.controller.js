@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { StatusCodes } from "http-status-codes";
-import { razorpayInstance } from "../config/razorpay.js";
+import { getRazorpay } from "../config/razorpay.js";
 import { Auction } from "../models/auction.model.js";
 import { Payment } from "../models/payment.model.js";
 import { env } from "../config/env.js";
@@ -56,7 +56,7 @@ export const createPaymentOrder = async (req, res, next) => {
       receipt
     };
 
-    const order = await razorpayInstance.orders.create(options);
+    const order = await getRazorpay().orders.create(options);
 
     // Save payment record
     await Payment.create({

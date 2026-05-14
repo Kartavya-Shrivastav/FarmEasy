@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { Auction } from "../models/auction.model.js";
 import { Bid } from "../models/bid.model.js";
+import { invalidateCache } from "../utils/cache.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 
 export const placeBid = async (req, res, next) => {
   try {
@@ -69,6 +71,16 @@ export const placeBid = async (req, res, next) => {
     const bid = await Bid.create({
       auction: auction._id,
       bidder: req.user._id,
+      amount: bidAmount
+    });
+
+    await invalidateCache(`auctions:single:${auction._id}`);
+
+    await publishEvent("bid.placed", {
+      auctionId: updated._id,
+      auctionTitle: updated.title,
+      bidderName: req.user.name,
+      bidderEmail: req.user.email,
       amount: bidAmount
     });
 
